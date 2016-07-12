@@ -106,7 +106,7 @@ My party is on my birthday!
     [@"my party" date: birthday]
 ```
 
-### Program Structure
+#### Program Structure
 
 The first thing to note is the broad structure of the program. An Eve program consists of any number of blocks. In this program, we have three blocks, which are are delineated by indentation. Any unindented text is treated as a comment. Anything indented is treated as code. Blocks are terminated at EOF or the next zero-indent line. Inline comments are possible using the `//` prefix anywhere in the code.
 
