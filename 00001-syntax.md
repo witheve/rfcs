@@ -1,21 +1,21 @@
 # RFC - Developer Syntax
 
-(A note before we get started: this is our first official Request for Comment (RFC). Taking a page out of the Rust playbook, we are not really going to define a rigid process here. RFCs are meant to be an informal communication for starting a discussion on a particlar feature, design, protocol, process, or anything else relating to Eve and the Eve community. RFCs will 
+(A note before we get started: this is our first official Request for Comment (RFC). Taking a page out of the Rust playbook, we are not really going to define a rigid process here. RFCs are meant to be an informal communication for starting a discussion on a particular feature, design, protocol, process, or anything else relating to Eve and the Eve community.)
 
 ## Summary
 
-Today we are soliciting community feedback on our current developer syntax proposal. In this RFC I'll present a complete program written in the syntax and explain how it works. We hope to specifically solicit comments on the following:
+Today we are soliciting community feedback on our current developer syntax proposal. In this RFC I'll present a complete program written in the syntax and explain how it works. We hope to specifically hear opinions on the following:
 
 1. How easy is it to read and understand code you haven't written in the proposed syntax?
-2. How easy is it to write code in the proposed syntax (despite that right now you can't actually execute much code)?
-3. Is the programming model clear? 
+2. How easy is it to write code in the proposed syntax?
+3. Is the programming model clear?
 4. Does the syntax support working and thinking in this model?
 5. What changes would you make to writing or reading easier?
 6. Did you experience any "ah ha!" moments while reading about the syntax? i.e. Was there something we said or an example we gave that made the whole thing click?
 
 ## Motivation
 
-In our [Jan/Feb dev diary](http://incidentalcomplexity.com/2016/06/10/jan-feb/) we talked a little about the need for a syntax for development, even if ultimately most users will never see it. We are specifically calling this a "developer syntax" because it is meant for software developers who know how to program.  
+In our [Jan/Feb dev diary](http://incidentalcomplexity.com/2016/06/10/jan-feb/) we talked a little about the need for a syntax for development, even if ultimately most users will never see it. We are specifically calling this a "developer syntax" because it is meant for software developers who know how to program. 
 
 To summarize: while the graphical interface is under development, a textual syntax helps us test the platform, share code, and find/report/reproduce bugs.
 
@@ -38,36 +38,41 @@ With these design goals in mind, I will walk you through a program written in ou
 
 ### Programming Model
 
-To really understand a syntax, you have to also understand the semantics of the underlying programming model, so that's where we will start. This discussion will be very high-level, so don't worry about the fine details for now. First, remember that Eve is not just a language; it is also a database. These are not separate components that interact; they are actually one and the same. However, sometimes we use "Eve DB" to refer to the underlying facts in the database.
+To really understand a syntax, you have to also understand the semantics of the underlying programming model, so that's where we will start. This discussion will be very high-level, so don't worry about the details for now. First, remember that Eve is not just a language; it is also a database. These are not separate components that interact; they are actually one and the same. However, sometimes we use "Eve DB" to refer to the underlying facts in the database.
 
-At its core, Eve only reponds to two commands:
+At its core, Eve only responds to two commands:
 
 1. What facts do you know about `x`?
 2. Remember a new fact about `x`.
 
-Communication with Eve happens through "objects", which are key-value pairs attached to a unique ID (object is a pretty generic and overloaded term, so let us know if you have ideas for what to call these guys). To access facts in the Eve DB, you use an object. To insert/remove facts into/from the Eve DB, you also use an object. 
+Communication with Eve happens through "objects", which are key-value pairs attached to a unique ID (object is a pretty generic and overloaded term, so let us know if you have ideas for what to call these guys). To access facts in the Eve DB, you use an object. To insert/remove facts into/from the Eve DB, you also use an object.
 
-Computation, occurs as a result of relationships between objects. For example, I might model myself as an object with an `age` and a `birth year`. There might also be an object representing the `current year`. Then I could compute my `age` as my `birth year` subtracted from the `current year`. 
+Computation, occurs as a result of relationships between objects. For example, I might model myself as an object with an `age` and a `birth year`. There might also be an object representing the `current year`. Then I could compute my `age` as my `birth year` subtracted from the `current year`.
 
 A key concept here is that age is a derived fact, supported by two other facts: `birth year` and `current year`. If either of those supporting facts are removed from the Eve DB, then `age` can no longer exist as well. For intuition, think about modeling this calculation in a spreadsheet using three cells, and what would happen to the `age` cell if you deleted one of the other two cells.
 
-Thus the presence or absence of facts can be used to control the flow of a program. To see how this works, consider how a naviagtion button on a webpage might work. When the button is clicked, a fact is inserted into the Eve DB noting the element that was clicked. This click fact would support an object that defines the page to be rendered. This in turn would support the page renderer, who's job it is to display the page.
+Thus the presence or absence of facts can be used to control the flow of a program. To see how this works, consider how a navigation button on a webpage might work. When the button is clicked, a fact is inserted into the Eve DB noting the element that was clicked. This click fact would support an object that defines the page to be rendered. This in turn would support the page renderer, whose job it is to display the page.
 
 One last thing to note about control flow is that we have no concept of a loop in Eve. Recursion is one way to recover looping, but set semantics and aggregates often obviate the need for recursion. In Eve, every value is actually a set. With operators defined over sets (think `map()`) and aggregation (think `reduce()`) we can actually do away with most cases where we would be tempted to use a loop.
+
+#### Set Semantics
+
+One other thing to know about Eve is that objects follow (set semantics)[https://en.wikipedia.org/wiki/Set_(mathematics)]. Sets are collections where every element of the collection is unique. This is in contrast to bag semantics, where elements can be duplicated. We’ll see the implications of this later, but it’s important to keep in mind.
 
 ### A Working Program - Party Planning
 
 Through the rest of this document, we'll refer to the following complete Eve program. Don't worry about not understanding it; we'll go over what all the parts mean, and then hopefully the function will become clear.
 
 ```
-This program is used to plan the number of burgers I need for my birthday party. 
+This program is used to plan the number of burgers I need for my birthday party.
 I will be inviting all my friends and their spouses, so I need to figure out
-how much food I need to buy! 
+how much food I need to buy!
 
 Count the number of guests coming to the party
   party = [name: "my party", date]
   guest = if p = [#friend busy-dates: not(party.date)] then p
-             if [#friend spouse busy-dates: not(party.date)] then spouse
+          if [#friend spouse busy-dates: not(party.date)] then spouse
+
   total = count(given guest)
   maintain
     party.guest-count := total
@@ -103,7 +108,7 @@ My party is on my birthday!
 
 ### Program Structure
 
-The first thing to note is the broad structure of the program. An Eve program consists of any number of blocks. In this program, we have three blocks, which are are delineated by indention. Any text at zero-indent is treated as a comment. Anything at greater than one-indent is treated as code. Blocks are terminated at EOF or the next zero-indent line. Inline comments are possible using the `//` prefix anywhere in the code.
+The first thing to note is the broad structure of the program. An Eve program consists of any number of blocks. In this program, we have three blocks, which are are delineated by indentation. Any unindented text is treated as a comment. Anything indented is treated as code. Blocks are terminated at EOF or the next zero-indent line. Inline comments are possible using the `//` prefix anywhere in the code.
 
 At the beginning of each block is a "block header" e.g. "How many burgers do I need?". These are meant primarily for documentation, and by convention they are a brief description of the purpose of the block. These are not "function handles" or anything that you call in code.
 
@@ -115,7 +120,7 @@ As noted in the Programming Model section, objects are the prevailing datatype i
 object1 = [ attribute1: value attribute2: value ...  attributeN: value]
 ```
 
-Objects are essentially pattern matches against the Eve DB, i.e. objects ask Eve to find all the entities that match the supplied attribute shape. For example, our first object in the program is `party = [name: "my party", date]`. The resulting `party` object will consist of all the facts matching a `name` attribute with value "my party" and a date attribute with any value.  
+Objects are essentially pattern matches against the Eve DB, i.e. objects ask Eve to find all the entities that match the supplied attribute shape. For example, our first object in the program is `party = [name: "my party", date]`. The resulting `party` object will consist of all the facts matching a `name` attribute with value "my party" and a date attribute with any value. 
 
 The `party` object also binds `date` to the top level `date` variable, accessible outside of the object. If you want to use `date` to mean something else, then you can alias it using the bind operator (see the next section). You can also access the unmatched attributes of an object using dot notation e.g. `party.date`.
 
@@ -167,7 +172,7 @@ Blocks themselves have their own structure as well. Each block is written in two
 
 #### Collect
 
-The collect phase is used to gather all the information you need to complete your block. In the following block, we want to count all the guests coming to the party. To do this, we need the date of the party, a list of all my friends and their availability, and then a summation of the result. Below, I've annotated what's going on in the collect phase.
+The collect phase is used to gather all the information you need to complete your block. In the following block, we want to count all the guests coming to the party. To do this, we need the date of the party, a list of all my friends and their availability, and then a count of the guests on the list. Below, I've annotated what's going on in the collect phase.
 
 ```
   // Select the party
@@ -195,9 +200,15 @@ Here, we are summing `burgers`, given the set of `burgers` and `guest`. This is 
 
 ##### If
 
-`If` allows conditional equivalence, and works a lot like `if` in other languages. In the above example, we add guests to the list if they are a friend and not busy, or if they are a spouse of a friend and not busy.
+`If` allows conditional equivalence, and works a lot like `if` in other languages. Our `if` has two parts: a conditional, following `if`; and a return, following `then`. In every case, an arm of an `if` returns only if the condition contains results. In the above example, we add guests to the list if they are a friend and not busy, or if they are a spouse of a friend and not busy. `If` can be used in two ways: one, you can chain a series of `if` statements, like in the example above. 
 
-`If` can be used in two ways: one, you can chain a series of `if` statements, like in the example above. This is equivalent to a union operator. The second way is demonstrated here:
+```
+  guest = if p = [#friend busy-dates: not(party.date)] then p
+              if [#friend spouse busy-dates: not(party.date)] then spouse
+
+```
+
+This is equivalent to a `union` operator, which combines elements from disparate sets into the same set. The second way to use `if` is demonstrated here:
 
 ```
   burgers = if guest = [#hungry] then 2
@@ -206,7 +217,7 @@ Here, we are summing `burgers`, given the set of `burgers` and `guest`. This is 
             else 1
 ```
 
-In this case, `if` is used as a `choose` operator, selecting only the first branch with non-empty results.
+In this case, `if` is used as a `choose` operator, selecting only the first branch with a non-empty body.
 
 ##### Not
 
@@ -214,20 +225,18 @@ Not is an anti-join operator, which takes a body of objects. In our example, we'
 
 ##### Expressions
 
-Expressions are used to perform caluclations using constants and attributes of objects e.g. `employee.salary * employee.bonus * 1.9`. Expressions are defined over sets, so the preceeding expression will work even if the cardinality (the number of elements in the set) of `employee.salary` is greater than one.
-
-There is a potential pitfall here: if the cardinality of the attributes in an expression are different, then the cardinality of the expression result will be a cartesian product of the attribute sets. For instance, if `|employe.salary| = 3` and `|employee.bonus| = 4`, then the result of the expression will have cardinality 12. This may actually be the desired behavior for some applications, but it could lead to unexpected behavior.      
+Expressions are used to perform calculations using constants and attributes of objects e.g. `employee.salary * employee.bonus * 1.9`. Expressions are defined over sets, so the preceding expression will work even if the cardinality (the number of elements in the set) of `employee.salary` is greater than one.
 
 #### Mutate
 
 (We're also not happy with the mutate nomenclature. Any suggestions are appreciated).
 
-In the mutate phase, we're ready to change the Eve DB in some way. The mutate phase is fenced off with either the `save` or `maintain` keywords (explained below). By convention, the mutate phase is indented twice. The implication of the fence are that we are telling Eve that we're not longer interested in asking questions about objects. Thus we're no longer able to use any statements applicable to the collect phase e.g. `if`, `not`, aggregates. If you feel like you need to use one of these things in the mutate phase, then 
+In the mutate phase, we're ready to change the Eve DB in some way. The mutate phase is fenced off with either the `save` or `maintain` keywords (explained below). By convention, the mutate phase is indented twice. The implication of the fence are that we are telling Eve that we're not longer interested in asking questions about objects. Thus we're no longer able to use any statements applicable to the collect phase e.g. `if`, `not`, aggregates.
 
 Let's look at what the first query does in the mutate phase:
 
 ```
-  // maintain tells us that we are updating the database
+  // maintain tells us that we are updating the database continually
   maintain
 
     // We set the guest-count to be the total number of guests we found
@@ -267,7 +276,7 @@ We have three operators for mutating objects in the Eve DB: add, set, and remove
 
 Mutation operators can be used in two ways. First, you can add/set/remove a specific attribute on an object. E.g. `object.attribute = value`. Values can be anything, including objects. The alternative way allows you to add/set/remove multiple attributes. E.g. `object += [attribute1: value, attribute2: value, ...]`.
 
-Mutations follow set semantics. If an attribute exists on an object, using += will just add it to the set. For instance, if `person.age = 10`, and `person.age += 20`, then `person.age = {10, 20}` (note, the curly braces are not part of the syntax, but are a standard way of indicating a set). 
+Mutations follow set semantics. If an attribute exists on an object, using += will just add it to the set. For instance, if `person.age = 10`, and `person.age += 20`, then `person.age = {10, 20}` (note, the curly braces are not part of the syntax, but are a standard way of indicating a set).
 
 ##### Save vs. Maintain
 
@@ -294,7 +303,7 @@ In this case, the fence is `maintain`, so we're specifying that `party.guest` wi
 
 ##### Code Reuse
 
-Eve has no concept of a function, but code reuse can be achieved through objects. Note that we have several statements that look like function application (e.g. aggregates and not), but these are not user definable.  
+Eve has no concept of a function, but code reuse can be achieved through objects. Note that we have several statements that look like function application (e.g. aggregates and not), but these are purely syntax sugar for convenience, and not user definable.
 
 To see how code reuse works, let's go back to our party example:
 
@@ -318,16 +327,20 @@ How long until my party?
 
 This completes the first block, so `party.timeleft` will be a continuously updating countdown to the date of the party.
 
-## Examples
+### Examples
 
-### Clock
-
-### Chat
-
-### TodoMVC
+Feel free to check out some more examples of programs written in the proposed syntax (here)[https://github.com/witheve/lueve/tree/master/examples]. In particular, the following applications are complete applications: (chat)[https://github.com/witheve/lueve/blob/master/examples/chat.eve], (clock)[https://github.com/witheve/lueve/blob/master/examples/clock.eve], and (todo-mvc)[https://github.com/witheve/lueve/blob/master/examples/todomvc.eve]. Please note, we’re still not sure about the correctness of these programs.
 
 ## Drawbacks
 
+One of the lines we are balancing is making the syntax familiar yet different. The proposed syntax is indeed very different from what people are used to.
+
+Another drawback is having a syntax at all, in that it forces us to maintain two disjoint interfaces for Eve: this textual syntax and a graphical interface for non-programmers. However, given the reasons outlined above, we believe this cost is worth paying.
+
 ## Alternatives
 
-## Unresolved questions
+We’ve tried various syntaxes before this one. Earlier this year we had a syntax based on s-expressions, which you can read about (here)[http://incidentalcomplexity.com/2016/06/10/jan-feb/] and (here)[http://incidentalcomplexity.com/2016/06/22/mar2/]. You can also look at our earliest syntax (here)[https://github.com/witheve/Eve/tree/syntax/examples].  
+
+## Risks
+
+The biggest risk here is that we will soon be introducing Eve to a much wider audience, and this syntax will be the face of Eve. Many people conflate a programming language with a syntax, and so a poor syntax will leave a poor lasting impression of Eve in general.
