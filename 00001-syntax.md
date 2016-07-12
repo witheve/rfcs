@@ -170,7 +170,7 @@ count guests coming to the party
 
 Blocks themselves have their own structure as well. Each block is written in two phases: collect then mutate. These mirror the Eve commands outlined above. In the collect phase, we ask Eve for known facts, and in the mutate phase we tell Eve to remember new facts. Let's look at each of those phases here:
 
-#### Collect
+#### Phase 1: Collect
 
 The collect phase is used to gather all the information you need to complete your block. In the following block, we want to count all the guests coming to the party. To do this, we need the date of the party, a list of all my friends and their availability, and then a count of the guests on the list. Below, I've annotated what's going on in the collect phase.
 
@@ -227,7 +227,7 @@ Not is an anti-join operator, which takes a body of objects. In our example, we'
 
 Expressions are used to perform calculations using constants and attributes of objects e.g. `employee.salary * employee.bonus * 1.9`. Expressions are defined over sets, so the preceding expression will work even if the cardinality (the number of elements in the set) of `employee.salary` is greater than one.
 
-#### Mutate
+#### Phase 2: Mutate
 
 (We're also not happy with the mutate nomenclature. Any suggestions are appreciated).
 
