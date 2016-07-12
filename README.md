@@ -1,3 +1,5 @@
+<img src="http://www.witheve.com/logo.png" width="10%">
+
 # Eve Requests for Comments (RFC)
 
 RFCs are meant to be an informal communication for starting a discussion on a particular feature, design, protocol, process, or anything else relating to Eve and the Eve community.
