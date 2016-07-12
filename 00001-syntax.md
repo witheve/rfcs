@@ -301,9 +301,9 @@ By contrast, consider:
 
 In this case, the fence is `maintain`, so we're specifying that `party.guest` will be automatically kept up-to-date. The behavior of this code is that a `guest` is a `#friend` who is not busy on the date of the party. Let’s say my friend Sam’s calendar is initially clear, and so he is originally on the guest list. Then some time later, Sam suddenly adds the party date to his list of busy dates. Now, he no longer satisfies the conditions of the block, and he is removed from the guest list (also subsequently lowering the burger count). Had we used the save fence, then his initial admittance to the guest list would be permanent, and we would have too many burgers for the party.
 
-##### Code Reuse
+### Code Reuse
 
-Eve has no concept of a function, but code reuse can be achieved through objects. Note that we have several statements that look like function application (e.g. aggregates and not), but these are purely syntax sugar for convenience, and not user definable.
+Finally, Eve has no concept of a function, but code reuse can be achieved through objects. Note that we have several statements that look like function application (e.g. aggregates and not), but these are purely syntax sugar for convenience, and not user definable.
 
 To see how code reuse works, let's go back to our party example:
 
