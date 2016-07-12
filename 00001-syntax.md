@@ -1,6 +1,6 @@
 # RFC - Developer Syntax
 
-(A note before we get started: this is our first official Request for Comment (RFC). Taking a page out of the Rust playbook, we are not really going to define a rigid process here. RFCs are meant to be an informal communication for starting a discussion on a particular feature, design, protocol, process, or anything else relating to Eve and the Eve community.)
+(A note before we get started: this is our first official Request for Comment (RFC). Taking a page out of the Rust playbook, we are not really going to define a rigid process here. RFCs are meant to be an informal communication for starting a discussion on a particular feature, design, protocol, process, or anything else relating to Eve and the Eve community. You can read more about our RFC process [here][https://github.com/witheve/rfcs].)
 
 ## Summary
 
