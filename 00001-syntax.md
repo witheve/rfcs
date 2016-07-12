@@ -339,7 +339,7 @@ Another drawback is having a syntax at all, in that it forces us to maintain two
 
 ## Alternatives
 
-We’ve tried various syntaxes before this one. Earlier this year we had a syntax based on s-expressions, which you can read about (here)[http://incidentalcomplexity.com/2016/06/10/jan-feb/] and (here)[http://incidentalcomplexity.com/2016/06/22/mar2/]. You can also look at our earliest syntax (here)[https://github.com/witheve/Eve/tree/syntax/examples].  
+We’ve tried various syntaxes before this one. Earlier this year we had a syntax based on s-expressions, which you can read about [here](http://incidentalcomplexity.com/2016/06/10/jan-feb/) and [here](http://incidentalcomplexity.com/2016/06/22/mar2/). You can also look at our earliest syntax [here](https://github.com/witheve/Eve/tree/syntax/examples).  
 
 ## Risks
 
