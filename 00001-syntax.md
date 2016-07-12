@@ -112,7 +112,7 @@ The first thing to note is the broad structure of the program. An Eve program co
 
 At the beginning of each block is a "block header" e.g. "How many burgers do I need?". These are meant primarily for documentation, and by convention they are a brief description of the purpose of the block. These are not "function handles" or anything that you call in code.
 
-#### Objects
+### Objects
 
 As noted in the Programming Model section, objects are the prevailing datatype in Eve. In this syntax, objects are a set of attribute:value pairs enclosed in square brackets:
 
@@ -124,7 +124,7 @@ Objects are essentially pattern matches against the Eve DB, i.e. objects ask Eve
 
 The `party` object also binds `date` to the top level `date` variable, accessible outside of the object. If you want to use `date` to mean something else, then you can alias it using the bind operator (see the next section). You can also access the unmatched attributes of an object using dot notation e.g. `party.date`.
 
-#### Binding, Equivalence, and Names
+### Binding, Equivalence, and Names
 
 Our syntax has two binding operators: colon ( `:` ), and equals ( `=` ). By convention, colon is used within objects, and equals is used outside of objects. Either way, binding works the same: binding asserts that the left hand side of the operator is equivalent to the right hand side. This is distinct from assignment, which is not a concept in our language.
 
@@ -145,11 +145,11 @@ Never true
 
 Names are a little more permissive in our syntax than other languages. We allow most symbols in a name (with the exception of space, @, #, //, period, question, comma, colon, and grouping symbols). So operators like '-' and '+' are valid symbols in a name. This comes at the cost of requiring whitespace in expressions. For example `friend-age` is a name. By contrast `friend - age` is subtracting age from friend.
 
-#### Name Selector ( `@` )
+### Name Selector ( `@` )
 
 The name selector is used to select a specific named entity from the Eve DB. Named entities are just entities with a `name` attribute specified. In the example program,`[@"my party"]` is shorthand for `[name: "my party"]`.
 
-#### Tag Selector ( `#` )
+### Tag Selector ( `#` )
 
 Tag selectors are used for selecting groups of similar entities i.e. entities with the same tag attribute. In the above example, we used `[#friend]`, which is shorthand for `[tag: "friend"]`.
 
