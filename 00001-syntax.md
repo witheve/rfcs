@@ -329,7 +329,7 @@ This completes the first block, so `party.timeleft` will be a continuously updat
 
 ### Examples
 
-Feel free to check out some more examples of programs written in the proposed syntax (here)[https://github.com/witheve/lueve/tree/master/examples]. In particular, the following applications are complete applications: (chat)[https://github.com/witheve/lueve/blob/master/examples/chat.eve], (clock)[https://github.com/witheve/lueve/blob/master/examples/clock.eve], and (todo-mvc)[https://github.com/witheve/lueve/blob/master/examples/todomvc.eve]. Please note, we’re still not sure about the correctness of these programs.
+Feel free to check out some more examples of programs written in the proposed syntax [here](https://github.com/witheve/lueve/tree/master/examples). In particular, the following applications are complete applications: [chat](https://github.com/witheve/lueve/blob/master/examples/chat.eve), [clock](https://github.com/witheve/lueve/blob/master/examples/clock.eve), and [todo-mvc](https://github.com/witheve/lueve/blob/master/examples/todomvc.eve). Please note, we’re still not sure about the correctness of these programs.
 
 ## Drawbacks
 
