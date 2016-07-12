@@ -28,7 +28,7 @@ An accepted RFC means that the proposal is on its way to becoming part of Eve, b
 
 # How to write an RFC
 
-There is no particular format or length for an RFC, but the following section headers might help get you started:
+There is no particular format or length for an RFC, but the following sections headers might help you organize your thoughts:
 
 1. Summary
 2. Motivation
