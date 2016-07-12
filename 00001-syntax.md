@@ -143,7 +143,7 @@ Never true
   person.age = 20
 ```
 
-Names are a little more permissive in our syntax than other languages. We allow most symbols in a name (with the exception of space, @, #, //, period, question, comma, colon, and grouping symbols). So operators like '-' and '+' are valid symbols in a name. This comes at the cost of requiring whitespace in expressions. For example `friend-age` is a name. By contrast `friend - age` is subtracting age from friend.
+Names are a little more permissive in our syntax than other languages. We allow most symbols in a name (with the exception of space, @, #, //, period, question, comma, colon, and grouping symbols). So operators like `-` and `+` are valid symbols in a name. This comes at the cost of requiring whitespace in expressions. For example `friend-age` is a name. By contrast `friend - age` is subtracting age from friend.
 
 ### Name Selector ( `@` )
 
