@@ -1,4 +1,4 @@
-<center><img src="http://www.witheve.com/logo.png" width="10%"></center>
+<div style="margin: 0 auto;"><img src="http://www.witheve.com/logo.png" width="10%"></div>
 
 # Eve Requests for Comments (RFC)
 
