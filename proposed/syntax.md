@@ -335,7 +335,7 @@ In this case, the fence is `maintain`, so we're specifying that `party.guest` wi
 
 ##### freeze all
 
-By default, any mutations made to the database are per session, meaning any facts you add to the database, are only visible to the session that added them. Both `freeze` and `maintain` can be optionally followed by the `all` keyword, which indicates that the subsequent mutations are available globally, to any all sessions connected to Eve.
+By default, any mutations made to the database are per session, meaning any facts you add to the database, are only visible to the session that added them. Both `freeze` can be optionally followed by the `all` keyword, which indicates that the subsequent mutations are available globally, to any all sessions connected to Eve.
 
 This is useful if you want to create a networked application, like chat:
 
