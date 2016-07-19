@@ -8,7 +8,7 @@ RFCs are meant to be an informal communication for starting a discussion on a pa
 
 ### Under Development
 
-Our community is in the early stages, so we're still figuring out how we want this process to work. Most likely, the RFC process will continually evolve to accommodate the needs of the Eve community as it grows.
+Our community is still in the early stages of development, so we're still figuring out how we want this process to work. Most likely, the RFC process will continually evolve to accommodate the needs of the Eve community as it grows.
 
 # When to write an RFC
 
