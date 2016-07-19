@@ -333,6 +333,23 @@ By contrast, consider:
 
 In this case, the fence is `maintain`, so we're specifying that `party.guest` will be automatically kept up-to-date. The behavior of this code is that a `guest` is a `#friend` who is not busy on the date of the party. Let’s say my friend Sam’s calendar is initially clear, and so he is originally on the guest list. Then some time later, Sam suddenly adds the party date to his list of busy dates. Now, he no longer satisfies the conditions of the block, and he is removed from the guest list (also subsequently lowering the burger count). Had we used the freeze fence, then his initial admittance to the guest list would be permanent, and we would have too many burgers for the party.
 
+##### freeze/maintain all
+
+By default, any mutations made to the database are per session, meaning any facts you add to the database, are only visible to the session that added them. Both `freeze` and `maintain` can be optionally followed by the `all` keyword, which indicates that the subsequent mutations are available globally, to any all sessions connected to Eve.
+
+This is useful if you want to create a networked application, like chat:
+
+```
+create a message on enter
+  [#user name]
+  event = [#keydown element, key: "enter"]
+  element = [#channel-input channel value]
+  freeze all
+    [#message event name, message: value, channel]
+```
+
+Here we get the username, and the message, and we create a message when enter is pressed. The `all` keyword makes this message available to all sessions on the server. If we ommitted the keyword, then no other users would actually receive the message.
+
 ### Code Reuse
 
 Finally, Eve has no concept of a function, but code reuse can be achieved through objects. Note that we have several statements that look like function application (e.g. aggregates and not), but these are purely syntax sugar for convenience, and not user definable.
