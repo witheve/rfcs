@@ -29,10 +29,10 @@ Thus, to get Eve out to early adopters sooner, we have developed a textual synta
 
 Here are the broad design goals we identified when designing the syntax:
 
-1. *For Humans* - This syntax is designed for humans, not compilers.
-2. *Readable* - Since code is read more than written, we want the syntax to be eminently readable.
-3. *Familiar* - Users unfamiliar with Eve should be able to read an Eve program and figure out what's going on at a high level.
-4. *Different* - This one is purposefully in contention with goal (3); we want the syntax to be familiar but not *too* familiar. After all, Eve itself is very different from most languages out there, so we don't want to se the appropriate expectations.
+1. **For Humans** - This syntax is designed for humans, not compilers.
+2. **Readable** - Since code is read more than written, we want the syntax to be eminently readable.
+3. **Familiar** - Users unfamiliar with Eve should be able to read an Eve program and figure out what's going on at a high level.
+4. **Different** - This one is purposefully in contention with goal (3); we want the syntax to be familiar but not *too* familiar. After all, Eve itself is very different from most languages out there, so we don't want to se the appropriate expectations.
 
 ### Programming Model
 
@@ -55,7 +55,7 @@ One last thing to note about control flow is that we have no concept of a loop i
 
 #### Set Semantics
 
-One other thing to know about Eve is that objects follow (set semantics)[https://en.wikipedia.org/wiki/Set_(mathematics)]. Sets are collections where every element of the collection is unique. This is in contrast to bag semantics, where elements can be duplicated. We’ll see the implications of this later, but it’s important to keep in mind.
+One other thing to know about Eve is that objects follow [set semantics](https://en.wikipedia.org/wiki/Set_(mathematics)). Sets are collections where every element of the collection is unique. This is in contrast to bag semantics, where elements can be duplicated. We’ll see the implications of this later, but it’s important to keep in mind.
 
 ### A Working Program - Party Planning
 
