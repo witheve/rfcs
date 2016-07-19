@@ -332,7 +332,7 @@ Calculate a time difference
     [#timediff targetdate? time-remaining]
 ```
 
-Here we define a resuable block by leaving some variables unbound. The `?` calls out that the preceeding variable `targetdate` is unbound in the block. According to our semantics, this block isn't functional until `targetdate` is bound, which we can do in another block:
+Here we define a reusable block by leaving some variables unbound. The `?` calls out that the preceding variable `targetdate` is unbound in the block. According to our semantics, this block isn't functional until `targetdate` is bound, which we can do in another block:
 
 ```
 How long until my party?
