@@ -346,7 +346,7 @@ This completes the first block, so `party.timeleft` will be a continuously updat
 
 ## Other Examples
 
-Feel free to check out some more examples of programs written in the proposed syntax [here](https://github.com/witheve/lueve/tree/master/examples). In particular, the following applications are complete applications: [chat](https://github.com/witheve/lueve/blob/master/examples/chat.eve), [clock](https://github.com/witheve/lueve/blob/master/examples/clock.eve), and [todo-mvc](https://github.com/witheve/lueve/blob/master/examples/todomvc.eve).
+Feel free to check out some more examples of programs written in the proposed syntax [here](https://github.com/witheve/eve/tree/master/examples). In particular, the following applications are complete applications: [chat](https://github.com/witheve/eve/blob/master/examples/chat.eve), [clock](https://github.com/witheve/eve/blob/master/examples/clock.eve), and [todo-mvc](https://github.com/witheve/eve/blob/master/examples/todomvc.eve).
 
 ## Drawbacks
 
@@ -356,7 +356,7 @@ Another drawback is having a syntax at all, in that it forces us to maintain two
 
 ## Alternatives
 
-We’ve tried various syntaxes before this one. Earlier this year we had a syntax based on s-expressions, which you can read about [here](http://incidentalcomplexity.com/2016/06/10/jan-feb/) and [here](http://incidentalcomplexity.com/2016/06/22/mar2/). You can also look at our earliest syntax [here](https://github.com/witheve/exe-experiments/tree/syntax/examples). 
+We’ve tried various syntaxes before this one. Earlier this year we had a syntax based on s-expressions, which you can read about [here](http://incidentalcomplexity.com/2016/06/10/jan-feb/) and [here](http://incidentalcomplexity.com/2016/06/22/mar2/). You can also look at our earliest syntax [here](https://github.com/witheve/eve-experiments/tree/syntax/examples). 
 
 ## Risks
 
