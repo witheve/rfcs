@@ -6,7 +6,7 @@
 
 RFCs are meant to be an informal communication for starting a discussion on a particular feature, design, protocol, process, or anything else relating to Eve and the Eve community.
 
-## Under Development
+### Under Development
 
 Our community is in the early stages, so we're still figuring out how we want this process to work. Most likely, the RFC process will continually evolve to accommodate the needs of the Eve community as it grows.
 
