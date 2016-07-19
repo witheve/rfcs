@@ -41,8 +41,3 @@ There is no particular format or length for an RFC, but the following section he
 7. Risks
 
 Again, feel free to use any or all of these sections, or add your own as you see fit.
-
-# Opening an RFC
-
-To open an RFC, just draft your proposal and create a new pull request in this repository. Your RFC will be tagged and reviewed by someone in the Eve community (we still need to work out an infrastructure for this process), and the RFC will be discussed by the community. They may suggest changes, point out competing or similar RFCs, and eventually the RFC will either be merged or rejected.
-If the RFC is merged, it will be assigned an issue where discussion can take place. Depending on the RFC, discussion may be directed to an external venue, but for transparency and posterity, we would appreciate that any discussion in an alternative venue be logged (meeting minutes, summary of a conversation, chat transcript, etc.) and linked in the original issue.
