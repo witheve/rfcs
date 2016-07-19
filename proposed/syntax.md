@@ -333,7 +333,7 @@ By contrast, consider:
 
 In this case, the fence is `maintain`, so we're specifying that `party.guest` will be automatically kept up-to-date. The behavior of this code is that a `guest` is a `#friend` who is not busy on the date of the party. Let’s say my friend Sam’s calendar is initially clear, and so he is originally on the guest list. Then some time later, Sam suddenly adds the party date to his list of busy dates. Now, he no longer satisfies the conditions of the block, and he is removed from the guest list (also subsequently lowering the burger count). Had we used the freeze fence, then his initial admittance to the guest list would be permanent, and we would have too many burgers for the party.
 
-##### freeze/maintain all
+##### freeze all
 
 By default, any mutations made to the database are per session, meaning any facts you add to the database, are only visible to the session that added them. Both `freeze` and `maintain` can be optionally followed by the `all` keyword, which indicates that the subsequent mutations are available globally, to any all sessions connected to Eve.
 
