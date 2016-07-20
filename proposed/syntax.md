@@ -34,7 +34,7 @@ Here are the broad design goals we identified when designing the syntax:
 1. **For Humans** - This syntax is designed for humans, not compilers.
 2. **Readable** - Since code is read more than written, we want the syntax to be eminently readable.
 3. **Familiar** - Users unfamiliar with Eve should be able to read an Eve program and figure out what's going on at a high level.
-4. **Different** - This one is purposefully in contention with goal (3); we want the syntax to be familiar but not *too* familiar. After all, Eve itself is very different from most languages out there, so we don't want to se the appropriate expectations.
+4. **Different** - This one is purposefully in contention with goal (3); we want the syntax to be familiar but not *too* familiar. After all, Eve itself is very different from most languages out there, so we don't want to see the appropriate expectations.
 
 ### Programming Model
 
