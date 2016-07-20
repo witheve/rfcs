@@ -1,3 +1,5 @@
+Discussion: https://github.com/witheve/rfcs/issues/5
+
 I'm still trying to build search-as-you-type input with Eve. However, Eve seems to lack any string functions.
 
 The bare minimum would be to have an expression that checks for substring in a string. Something like this JS function:
