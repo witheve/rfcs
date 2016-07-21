@@ -10,6 +10,11 @@ RFCs are meant to be an informal communication for starting a discussion on a pa
 
 Our community is still in the early stages of development, so we're still figuring out how we want this process to work. Most likely, the RFC process will continually evolve to accommodate the needs of the Eve community as it grows.
 
+# Proposed RFCs
+
+- [Syntax](https://github.com/witheve/rfcs/blob/master/proposed/syntax.md)  - [Discussion](https://github.com/witheve/rfcs/issues/4)
+- [Strings](https://github.com/witheve/rfcs/blob/master/proposed/strings.md) - [Discussion](https://github.com/witheve/rfcs/issues/5)
+
 # When to write an RFC
 
 There is no one "test" that elevates a pull request to an RFC. However, one good rules is that an RFC is appropriate when the proposal affects disparate areas of the Eve community, especially across team boundaries. For example, a change to the syntax would affect everything from the parser to user programs, so it would certainly warrant an RFC.
