@@ -64,48 +64,71 @@ One other thing to know about Eve is that objects follow [set semantics](https:/
 Through the rest of this document, we'll refer to the following complete Eve program. Don't worry about not understanding it; we'll go over what all the parts mean, and then hopefully the program will become clear. Let’s dive right in:
 
 ```
-This program is used to plan the number of burgers I need for my birthday party.
-I will be inviting all my friends and their spouses, so I need to figure out
-how much food I need to buy!
+invite friends who are not busy
+  [@"my party" date]
+  friend = [#friend busy-dates != date]
+  maintain
+    friend += [#invited]
+    
+invite spouses of friends who are invited
+  [#invited spouse]
+  maintain 
+    spouse += [#invited]
 
-Count the number of guests coming to the party
- party = [name: "my party", date]
- guest = if p = [#friend busy-dates: not(party.date)] then p
-         if [#friend spouse busy-dates: not(party.date)] then spouse
+calculate how many burgers we need
+  guest = [#invited name]
+  party = [@"my party"]
+  burgers = if guest = [@Arthur] then 3
+            else if guest = [#hungry] then 2
+            else if guest = [#vegetarian] then 0
+            else 1
+  total-burgers = sum(burgers given burgers, guest)
+  maintain
+    party.burgers := total-burgers
+    guest.burgers := burgers
+  
+display the guest list
+  [@"my party" burgers]
+  guest = [#invited name]
+  burger-switch = if guest.burgers = 1 then "burger"
+                  else "burgers"
+  maintain
+    [#div children:
+      [#h1 text: "Guest List"]
+      [#div text: "{{name}} will eat {{guest.burgers}} {{burger-switch}}" sort: name]
+      [#h2 text: "Total burgers needed: {{burgers}}"]]
 
- total = count(given guest)
- maintain
-    party.guest-count := total
-    party.guest += guest
+create the party
+  [#session-connect]
+  freeze
+    [@"my party" date: 2]
 
-How many burgers do I need?
- party = [@"my party" guest]
- burgers = if guest = [#hungry] then 2
-           else if guest = [@arthur] then 3 // my friend arthur eats too many burgers
-           else if guest = [#vegetarian] then 0
-           else 1
- total = sum(burgers given burgers, guest)
- maintain
-           guest.burgers += burgers
-    party.burgers := total
+Add facts about my friends
+  maintain
+    [#friend name: "James", busy-dates: 1 #hungry, spouse: [@Sam]]
+    [#friend name: "Betty", busy-dates: 2, spouse: [@Joe], #hungry]
+    [#friend name: "Carol",   busy-dates: 3 #vegetarian]
+    [#friend name: "Duncan", busy-dates: 4]
+    [#friend name: "Arthur", busy-dates: 3, #hungry]
+    [name: "Sam" busy-dates: 3]
+    [name: "Joe" busy-dates: 4]
 
-Calculate a time difference
- [#time date: today]
- time-remaining = targetdate - today
- maintain
-    [#timediff targetdate? time-remaining]
+---
 
-How long until my party?
- party = [@"my party" date]
- [#timediff targetdate: date, time-remaining]
- maintain
-    party.timeleft = time-remaining
+Expected result:
 
-My party is on my birthday!
- [@Corey birthday]
- freeze
-    [@"my party" date: birthday]
+# Guest List
+
+Arthur will eat 3 burgers
+Carol will eat 0 burgers
+Duncan will eat 1 burger
+James will eat 2 burgers
+Sam will eat 1 burger
+
+## Total burgers needed: 7
 ```
+
+Note: At the moment, this program does not execute correctly.
 
 #### Program Structure
 
@@ -163,82 +186,89 @@ The tag selector is used for selecting a group of similar objects i.e. objects w
 Let's focus in on the first block:
 
 ```
-count guests coming to the party
- // Phase 1: Collect
- party = [@"my party" date]
- guest = if p = [#friend busy-dates: not(party.date)] then p
-         if [#friend spouse busy-dates: not(party.date)] then spouse
- total = count(given guest)
- // Phase 2: Mutate
- maintain
-    party.guest-count := total
-    party.guest += guest
+invite friends who are not busy
+  // Phase 1: Collect
+  [@"my party" date]
+  friend = [#friend busy-dates != date]
+  // Phase 2: Mutate
+  maintain
+    friend += [#invited]
 ```
 
-Blocks themselves have their own structure as well. Each block is written in two phases: collect then mutate. These mirror the Eve commands outlined above. So you can see, an Eve program is just continued repetition of collect/mutate operations.
-
-In the collect phase, we ask Eve for known facts, and we might transform those facts using temporary variables. In the mutate phase we tell Eve to remember new facts. Let's look at each of those phases here:
+Blocks themselves have their own structure as well. Each block is written in two phases: collect then mutate, mirroring the Eve commands outlined earlier. In the collect phase, we ask Eve for known facts, and we might transform those facts using temporary variables. In the mutate phase we tell Eve to remember new facts. Let's look at each of those phases now:
 
 #### Phase 1: Collect
 
 The collect phase is used to gather all the information you need to complete your block. In the following block, we want to count all the guests coming to the party. To do this, we need the date of the party, a list of all my friends and their availability, and then a count of the guests on the list. Below, I've annotated what's going on in the collect phase.
 
 ```
- // Select the party
- party = [@"my party" date]
-
-         // Add my friends to the guest list if they are not busy the day of the party
- guest = if p = [#friend busy-dates: not(party.date)] then p
-
-         // Add my friends' spouses to the list if they are not busy
-         if [#friend spouse busy-dates: not(party.date)] then spouse
-
- // Count all the total number of guests
- total = count(given guest)
+  // Phase 1: Collect
+  [@"my party" date]                    // Select the party and the date of the party
+  friend = [#friend busy-dates != date] // Select friends who are not busy during the party 
 ```
 
-Let's take a closer look at what you can do in the collect phase:
+Let's take a look at other things you can do in the collect phase:
 
 ##### **Aggregates**
 
 Aggregates are functions that take an input set and produce an output set, typically with a different cardinality than the input set. For example, `count` takes an input set of cardinality `N` and produces a set of cardinality `1` as a result. A familiar analogue in other languages is the `reduce()` function. Here is an example of an aggregate in use:
 
 ```
- total = count(given guest)
+ total-burgers = sum(burgers given burgers, guest)
 ```
 
-Aggregates are called like functions in other languages, but there is a slight difference. Here, the keyword `given` specifies the set we are counting. A better example of this is the `sum` aggregate:
+Aggregates are called like functions in other languages, but there is a slight difference; the keyword `given` specifies the set we are summing over. 
 
-`total = sum(burgers given burgers, guest)`
-
-Here, we are summing `burgers`, given the set of `burgers` and `guest`. This is important because of our set semantics. If we had just `sum(given burgers)`, then the duplicate elements of `burgers` would be removed and we would arrive at the wrong number. By adding `guest` to the set, we ensure that every guest’s burger quantity properly counted.
+Recall that a set is an unordered collection of unique elements. In our example, `burgers = (3, 0, 1, 2, 1)`, which as a set is `{3, 0, 1, 2}`. Thus `sum(burgers given burgers) = 6`, which is not what we expect. However, when we say `sum(burgers given burgers, guests)` then each burger is associated with a corresponding guest, making each element unique e.g. `(burgers, guest) = {{Arthur, 3}, {Carol, 0}, {Duncan, 1}, {James, 2}, {Sam, 1}}`. Summing burgers given this set yields the expected result of `7`, because the duplicated one is now unique.
 
 ##### **If**
 
-`If` allows conditional equivalence, and works a lot like `if` in other languages. Our `if` has two parts: `if` followed by a conditional; and `then` followed by a return object(s). In every case, an arm of an `if` returns only if the condition contains results. In the above example, we add guests to the list if they are a friend and not busy, or if they are a spouse of a friend and not busy. 
-
-`If` can be used in two ways. First, you can chain a series of `if` statements, like in this example:
+`If` allows conditional equivalence, and works a lot like `if` in other languages. Our `if` has two components: The keyword `if` followed by a conditional; and the keyword `then` followed by one or more return objects. An optional `else` keyword indicates the default value:
 
 ```
- guest = if p = [#friend busy-dates: not(party.date)] then p
-             if [#friend spouse busy-dates: not(party.date)] then spouse
-
+burger-switch = if guest.burgers = 1 then "burger"
+                else "burgers"
 ```
 
-This is equivalent to a `union` operator, which combines elements from disparate sets into the same set. The second way to use `if` is in combination with the `else` keyword:
+This block is used to switch between the singular and plural for displaying the number of burgers each guest is eating. `If` statements can be composed, permitting the creation of complex conditional statements. For instance, instead of inviting friends and their spouses in two blocks (the first two blocks in the example program), I could have done it in a single block using an `if` statement:
 
 ```
- burgers = if guest = [#hungry] then 2
-           else if guest = [@arthur] then 3
-           else if guest = [#vegetarian] then 0
-           else 1
+invite friends who are not busy and their spouses
+  [@"my party" date]
+  friend = [#friend busy-dates != date]
+  guest = if friend then friend
+          if friend.spouse then friend.spouse
 ```
 
-In this case, `if` is used as a `choose` operator, selecting only the first branch with a non-empty body. If some guest is tagged both `#hungry` and `#vegetarian`, that guest will actually receive 2 burgers. Therefore, while order of statements usually does not matter in Eve, `if` statements are one area where it does.
+This is equivalent to a `union/and` operator, which combines elements from disparate sets into the same set. The second way to use `if` is in conjunction with the `else` keyword:
+
+```
+  burgers = if guest = [@Arthur] then 3
+            else if guest = [#hungry] then 2
+            else if guest = [#vegetarian] then 0
+            else 1
+```
+
+This is equivalent to a `choose/or` operator, selecting only the first branch with a non-empty body. A bug in this program is that if some guest is tagged both `#hungry` and `#vegetarian`, that guest will actually receive 2 burgers. Therefore, while order of statements usually does not matter in Eve, `if` statements are one area where it does.
+
+A final feature of the if statement is mutltiple returns. For instance, we could have done this:
+
+```
+  (burgers, status) = if guest = [@Arthur] then (3, #fed)
+                      else if guest = [#hungry] then (2, #fed)
+                      else if guest = [#vegetarian] then (0, #needsfood)
+                      else (1, #fed)
+```
 
 ##### **Not**
 
-Not is an anti-join operator, which takes a body of objects. In our example, we've specified the date of "my party", and each `#friend` has specified the dates they are busy. A `#friend` can only go to the party if the date of the party is not on her list of busy dates. e.g. `[#friend busy-dates: not(party.date)]`.
+Not is an anti-join operator, which takes a body of objects. For example, we can get a list of people who are not invited to the party:
+
+```
+friends not invited to the party
+  friends = [#friend]
+  not(friend = [#invited])
+```
 
 ##### **Expressions**
 
@@ -248,16 +278,17 @@ Operators are defined over sets, so you could do something like `cheese-slices =
 
 ##### **String Interpolation**
 
-We support string interpolation using double curly braces e.g. {{ }}. For instance, consider the following:
+We support string interpolation (concatenation) is implemented using double curly braces e.g. `{{ }}`. For instance, when we print output, we use string interpolation to format the results:
 
 ```
-print the guests and burgers
-  [#party-guest guest burgers]
   maintain
-    [#div text: "{{guest.name}} is going to eat {{burgers}} burgers"]
+    [#div children:
+      [#h1 text: "Guest List"]
+      [#div text: "{{name}} will eat {{guest.burgers}} {{burger-switch}}" sort: name]
+      [#h2 text: "Total burgers needed: {{burgers}}"]]
 ```
 
-In this block of code, we select the guests of the party and the number of burgers they are going to eat at the party. The last line of the block prints this information in a sentence. Notice that because of set semantics, we only wrote code to print a single sentence; when the code is executed, the sentence will be printed once for every guest.
+Notice that the div printing the guest list is only written once, but because of set semantics, it will be printed as many times as there are elements in the set (in this case we'd expect it to be printed 5 times). For the same reason, the total burger count will only be printed once.
 
 #### Phase 2: Mutate
 
@@ -268,27 +299,20 @@ In the mutate phase, we're ready to change the Eve DB in some way. The mutate ph
 Let's look at what happens in the mutate phase (this one comes from the first block in our party program):
 
 ```
- // maintain tells us that we are updating the database continually
- maintain
-
-    // We set the guest-count to be the total number of guests we found
-    // in the collect phase. This will overwrite whatever the total
-    // was before
-    party.guest-count := total
-
-    // We add new guests to the guest list. This will add to the
-    // existing list    
-    party.guest += guest
+ // maintain tells us that we are delegating Eve the responsibiliy to update the subsequent values
+  maintain
+    friend += [#invited] // Add #invited to every friend who is invited
 ```
 
 ##### Adding and Removing Objects
 
-Objects can be freezed to the Eve DB just by adding them after a mutation fence:
+Objects can be "frozen" in the Eve DB just by adding them after a mutation fence:
 
 ```
- [@Corey birthday]
- freeze
-    [@"my party" date: birthday]
+create the party
+  [#session-connect]
+  freeze
+    [@"my party" date: 2]
 ```
 
 Objects can be removed from Eve using the `none` keyword. For example, we could remove `@"my party"` like so:
@@ -315,66 +339,40 @@ Mutations follow set semantics. If an attribute exists on an object, using += wi
 We have two fences for the mutation phase, with differing behaviors. When you use `freeze`, you're telling Eve that you want the subsequent facts to persist in the database, irrespective of the supporting data. To see what I mean by this, For example, look at the last query:
 
 ```
-my party is on my birthday!
- [@Corey birthday]
- freeze
-    [@"my party" date: birthday]
+create the party
+  [#session-connect]
+  freeze
+    [@"my party" date: 2]
 ```
 
-We use `freeze`, so even if `@Corey` or his birthday are deleted from the database, `@"my party"` will still remain.
-
-By contrast, consider:
+We use `freeze` to indicate that this fact is frozen in time in the database, that time being when I connect to the Eve server. By contrast, consider:
 
 ```
- guest = [#friend busy-dates: not(party.date)]
- maintain
-    party.guest += guest
+invite friends who are not busy
+  [@"my party" date]
+  friend = [#friend busy-dates != date]
+  maintain
+    friend += [#invited]
 ```
 
-In this case, the fence is `maintain`, so we're specifying that `party.guest` will be automatically kept up-to-date. The behavior of this code is that a `guest` is a `#friend` who is not busy on the date of the party. Let’s say my friend Sam’s calendar is initially clear, and so he is originally on the guest list. Then some time later, Sam suddenly adds the party date to his list of busy dates. Now, he no longer satisfies the conditions of the block, and he is removed from the guest list (also subsequently lowering the burger count). Had we used the freeze fence, then his initial admittance to the guest list would be permanent, and we would have too many burgers for the party.
+In this case, the fence is `maintain`, so we're specifying that Eve will automatically keep `friend` up-to-date. The behavior of this code is that a `friend` is `#invited` as long as they are not busy during the date of the party. Let’s say my friend `@Arthur`’s calendar is initially clear, and so he is originally `#invited`. Then some time later, `@Arthur` suddenly adds the party date to his list of busy dates. Now, he no longer satisfies the conditions of the block, so Eve removes `#invited` from `@Arthur`, and he no longer shows up on the guest list, which also subsequently lowers the burger count. Had we used the freeze fence, then his initial admittance to the guest list would be permanent, and we would have too many burgers for the party.
 
 ##### freeze all
 
-By default, any mutations made to the database are per session, meaning any facts you add to the database, are only visible to the session that added them. Both `freeze` can be optionally followed by the `all` keyword, which indicates that the subsequent mutations are available globally, to any all sessions connected to Eve.
+By default, any mutations made to the database are per session, meaning any facts you add to the database, are only visible to the session that added them. `Freeze` can be optionally followed by the `all` keyword, which indicates that the subsequent mutations are available globally, to all sessions connected to Eve.
 
-This is useful if you want to create a networked application, like chat:
+This is useful if you want to create a networked application. For our example, I might ask all my friends to write the following query:
 
 ```
-create a message on enter
-  [#user name]
-  event = [#keydown element, key: "enter"]
-  element = [#channel-input channel value]
+Hi friends. Please edit the following Eve code for my party planning app.
+Just fill in your name, the dates your are busy, and add your spouse as well.
+You can also add either of the following tags: #hungry, and #vegetarian.
+  [#session-connect]
   freeze all
-    [#message event name, message: value, channel]
+    [#friend name busy-dates spouse]
 ```
 
-Here we get the username, and the message, and we create a message when enter is pressed. The `all` keyword makes this message available to all sessions on the server. If we ommitted the keyword, then no other users would actually receive the message.
-
-### Code Reuse
-
-Finally, Eve has no concept of a function, but code reuse can be achieved through objects. Note that we have several statements that look like function application (e.g. aggregates and not), but these are purely syntax sugar for convenience, and not user definable.
-
-To see how code reuse works, let's go back to our party example:
-
-```
-Calculate a time difference
- [#time date: today]
- time-remaining = targetdate - today
- maintain
-    [#timediff targetdate? time-remaining]
-```
-
-Here we define a reusable block by leaving some variables unbound. The `?` calls out that the preceding variable `targetdate` is unbound in the block. According to our semantics, this block isn't functional until `targetdate` is bound, which we can do in another block:
-
-```
-How long until my party?
- party = [@"my party" date]
- [#timediff targetdate: date, time-remaining]
- maintain
-    party.timeleft = time-remaining
-```
-
-This completes the first block, so `party.timeleft` will be a continuously updating countdown to the date of the party.
+Now, when my friends execute that block (filled in with their details), their data is available to my party planning application. 
 
 ## Other Examples
 
