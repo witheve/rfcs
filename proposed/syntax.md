@@ -31,10 +31,10 @@ Thus, to get Eve out to early adopters sooner, we have developed a textual synta
 
 Here are the broad design goals we identified when designing the syntax:
 
-1. **For Humans** - This syntax is designed for humans, not compilers.
+1. **For Humans** - This syntax is designed for humans, so decisions regarding the ergonomics of the syntax are of primary concern.
 2. **Readable** - Since code is read more than written, we want the syntax to be eminently readable.
-3. **Familiar** - Users unfamiliar with Eve should be able to read an Eve program and figure out what's going on at a high level.
-4. **Different** - This one is purposefully in contention with goal (3); we want the syntax to be familiar but not *too* familiar. If our syntax is too close to other languages (e.g. if we used c-style curly braces), we might give the expectation that our semantics are similar, when they are very different.
+3. **Consistent** - The syntax should be consistent with prior knowledge, so that users unfamiliar with Eve can read an Eve program and figure out what’s going on at a high level without explicitly knowing the syntax.
+4. **Distinct** - This one is purposefully in contention with goal (3); we want the syntax to be familiar but not too familiar. If our syntax is too close to other languages (e.g. if we used c-style curly braces), we might project that our semantics are similar, when in fact they are very different.
 
 ### Programming Model
 
@@ -42,8 +42,8 @@ To really understand a syntax, you have to also understand the semantics of the 
 
 At its core, Eve only responds to two commands:
 
-1. What facts do you know about `x`?
-2. Remember a new fact about `x`.
+1. What facts do you know about this "object"?
+2. Remember a new fact about this "object".
 
 Communication with Eve happens through "objects", which are key-value pairs attached to a unique ID (object is a pretty generic and overloaded term, so let us know if you have ideas for what to call these guys). To access facts in the Eve DB, you use an object. To insert/remove facts into/from the Eve DB, you also use an object.
 
@@ -61,21 +61,44 @@ One other thing to know about Eve is that objects follow [set semantics](https:/
 
 ### A Working Program - Party Planning
 
-Through the rest of this document, we'll refer to the following complete Eve program. Don't worry about not understanding it; we'll go over what all the parts mean, and then hopefully the program will become clear. Let’s dive right in:
+Through the rest of this document, we'll refer to the following complete Eve program. Don't worry about understanding it right now; we'll go over what all the parts mean, and then hopefully the program will become clear. Let’s dive right in:
+
+``````
+# Planning my birthday party
+
+This program figures out who can attend my party, and calculates how many burgers 
+I need to buy. 
+
+First I invite friends to the party. I can only invite friends who are not busy 
+on the date of the party. Each one of my friends has marked their busy dates for 
+me.
 
 ```
-invite friends who are not busy
-  [@"my party" date]
+match
+  party = [@"my party" date]
   friend = [#friend busy-dates != date]
-  maintain
-    friend += [#invited]
-    
-invite spouses of friends who are invited
-  [#invited spouse]
-  maintain 
-    spouse += [#invited]
+bind
+  friend += #invited
+```
 
-calculate how many burgers we need
+Guests are allowed to bring their spouses, so I have to invite them as well. I 
+won't invite spouses of friends who can't come to the party though.
+
+```
+match
+  [#invited spouse]
+bind 
+  spouse += #invited
+```
+
+I'm only serving burgers at my party. Guests can have between 0 and 3 burgers. 
+Vegetarians don't want any burgers, the standard amount is 1, and `#hungry` 
+guests get 2. My friend `@Arthur` gets 3 burgers, because he's exceptionally 
+hungry. I need to keep track of the total number of burgers needed, as well as 
+how many each guest prefers.
+
+```
+match
   guest = [#invited name]
   party = [@"my party"]
   burgers = if guest = [@Arthur] then 3
@@ -83,39 +106,56 @@ calculate how many burgers we need
             else if guest = [#vegetarian] then 0
             else 1
   total-burgers = sum(burgers given burgers, guest)
-  maintain
-    party.burgers := total-burgers
-    guest.burgers := burgers
-  
-display the guest list
+bind
+  party.burgers := total-burgers
+  guest.burgers := burgers
+```
+
+Finally, I need to display the guest list and how many burgers I need total.
+
+```
+match
   [@"my party" burgers]
   guest = [#invited name]
   burger-switch = if guest.burgers = 1 then "burger"
                   else "burgers"
-  maintain
-    [#div children:
-      [#h1 text: "Guest List"]
-      [#div text: "{{name}} will eat {{guest.burgers}} {{burger-switch}}" sort: name]
-      [#h2 text: "Total burgers needed: {{burgers}}"]]
+bind
+  [#div children:
+    [#h1 text: "Guest List"]
+    [#div text: "{{name}} will eat {{guest.burgers}} {{burger-switch}}" sort: name]
+    [#h2 text: "Total burgers needed: {{burgers}}"]]
+```
 
-create the party
+## Data
+
+The rest of the code establishes the data needed to run the above program. I 
+instantiate the party here.
+
+```
+match
   [#session-connect]
-  freeze
-    [@"my party" date: 2]
+commit
+  [@"my party" date: 2]
+```
 
-Add facts about my friends
-  maintain
-    [#friend name: "James", busy-dates: 1 #hungry, spouse: [@Sam]]
-    [#friend name: "Betty", busy-dates: 2, spouse: [@Joe], #hungry]
-    [#friend name: "Carol",   busy-dates: 3 #vegetarian]
-    [#friend name: "Duncan", busy-dates: 4]
-    [#friend name: "Arthur", busy-dates: 3, #hungry]
-    [name: "Sam" busy-dates: 3]
-    [name: "Joe" busy-dates: 4]
+I also need to add facts about my friends in order for this to all work.
 
----
+```
+bind
+  [#friend name: "James", busy-dates: 1 #hungry, spouse: [@Sam]]
+  [#friend name: "Betty", busy-dates: 2, spouse: [@Joe], #hungry]
+  [#friend name: "Carol", busy-dates: 3 #vegetarian]
+  [#friend name: "Duncan", busy-dates: 4]
+  [#friend name: "Arthur", busy-dates: 3, #hungry]
+  [name: "Sam" busy-dates: 3]
+  [name: "Joe" busy-dates: 4]
+```
+
+## Results
 
 Expected result:
+
+---
 
 # Guest List
 
@@ -126,27 +166,40 @@ James will eat 2 burgers
 Sam will eat 1 burger
 
 ## Total burgers needed: 7
-```
+``````
 
 Note: At the moment, this program does not execute correctly.
 
 #### Program Structure
 
-The first thing to note is the broad structure of the program. An Eve program consists of any number of “blocks”. In this program, we have five blocks, which are are delineated by indentation; unindented text is treated as a comment, while indented text is treated as code. Blocks are terminated at EOF or the next unindented line. Inline comments are possible using the `//` prefix anywhere in the program.
+The first thing to notice is the broad structure of the program. In the spirit of [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming), Eve programs are primarily prose, interleaved with Eve code. Donald Knuth explains Literate Programming in his [influential paper](http://www.literateprogramming.com/knuthweb.pdf): 
 
-At the beginning of each block is a "block header" e.g. "How many burgers do I need?". These are meant primarily for documentation, and by convention they are a brief description of the purpose of the block. Note that these are not "function handles" or anything that you call in code.
+> The practitioner of literate programming can be regarded as an essayist, whose main concern is with exposition and excellence of style. Such an author ...  strives for a program that is comprehensible because its concepts have been introduced in an order that is best for human understanding, using a mixture of formal and informal methods that reinforce each other.
+
+This description fits with the ethos of Eve - that programming is primarily meant to communicate with other humans, not the computer. You'll notice the above Eve program is actually written in two languages: Markdown, used to format the prose; and Eve, which is deliniated by standard Markdown code blocks. Only the content within a block is compiled, while everything else is disregarded as a comment.
+
+Writing code this way has several properties that result in higher quality programs:
+
+- Literate programming forces you to consider a human audience. While this is usually the first step in writing any document, in programming the audience is typically a machine. For an Eve program, the audience might be your collaborators, your boss, or even your future self when revisiting the program in a year. By considering the audience of your program source, you create an anchor from which the narrative of your program flows, leading to a more coherant document.
+- The human brain is [wired to engage](https://blog.bufferapp.com/science-of-storytelling-why-telling-a-story-is-the-most-powerful-way-to-activate-our-brains) with and remember stories. Think back to a book you read (or maybe a show you watched) last year. You probably remember in great detail all of the characters and their personalities, the pivitol moments of the plot, the descriptions of the various settings, etc. But how much can you remember of a piece of code you haven't looked at for year? Literate programming adds another dimension to your code that will help you keep more of your program in working memory.
+- Since Eve code blocks can be arranged in any order, literate programming encourages the programmer to arrange them in an way that makes narrative sense. Code can have a beginning, middle, and end just like a short story. Or like an epic novel, code can have many interwoven storylines. Either way, the structure of the code should follow an order imposed by a narrative, not one imposed by the compiler.
+- It's often said that you don't really understand something until you explain it to someone else. Literate programming can reveal edge cases, incorrect assumptions, gaps in understanding the problem domain, and shaky implementation details before any code is even written.
+
+Literate programming is a first-class design concept in Eve. We will be writing all of our programs in this this manner, and will encourage others to do the same for the reasons above. That said, there is nothing in the syntax that specifically requires literate programming; you can write your program as a series of code blocks without any prose, and it will be perfectly valid.
 
 ### Objects
 
 Objects are the predominant datatype in Eve. In the proposed syntax, objects are a set of attribute:value pairs enclosed in square brackets:
 
 ```
-object = [ attribute1: value attribute2: value ...  attributeN: value]
+object = [ attribute1: value1 attribute2: value2 ...  attributeN: valueN]
 ```
 
-Objects are essentially pattern matches against the Eve DB, i.e. objects ask Eve to find all the entities that match the supplied attribute shape. For example, our first object in the program is `party = [name: "my party", date]`. The resulting `party` object will consist of all the facts matching a `name` attribute with value "my party" and a date attribute with any value.
+Objects are essentially pattern matches against the Eve DB, i.e. objects ask Eve to find all the entities that match the supplied attribute shape. For example, our first object in the program is `[@"my party" date]`. The resulting object will consist of all the facts matching a `name` attribute with value "my party" and a date attribute with any value.
 
-The `party` object also binds `date` to the top level `date` variable, accessible outside of the object (but only within the block). If you want to use `date` to mean something else, then you can alias it using the bind operator (see the next section). You can also access the unmatched attributes of an object using dot notation e.g. `party.date`.
+The object also binds `date` to the top level `date` variable, accessible outside of the object (but only within the block). If you want to use `date` to mean something else, then you can alias it using the bind operator (see the next section). 
+
+Objects can be bound to a variable e.g. `party = [@"my party" date]`. This provides a handle to the object, allowing you to access and mutate attributes using dot notation e.g. `party.date`.
 
 ### Binding, Equivalence, and Names
 
@@ -167,9 +220,9 @@ Never true
  person.age = 20
 ```
 
-Names are a little more permissive in our syntax than other languages. We allow most symbols in a name (with the exception of space, @, #, //, period, question, comma, colon, and grouping symbols). So operators like `-` and `+` are valid symbols in a name. This comes at the cost of requiring whitespace in expressions. For example `friend-age` is a name. By contrast `friend - age` is subtracting age from friend.
+Names are a little more permissive in our syntax than other languages. We allow most symbols in a name (with the exception of space, @, #, //, period, question, comma, colon, and grouping symbols). So operators like `-` and `+` are valid symbols in a name. Furthermore, we support Unicode, so you can include symbols (such as letters from the Greek alphabet). Such permissive naming comes at the cost of requiring whitespace in expressions. For example `friend-age` is a name, whereas `friend - age` is subtracting `age` from `friend`.
 
-### Names and Tags
+### Object Names and Tags
 
 We’ve identified two attributes that are generally useful, so we’ve given them special syntax. These attributes are `name` and `tag`.
 
@@ -183,28 +236,28 @@ The tag selector is used for selecting a group of similar objects i.e. objects w
 
 ### Block structure
 
-Let's focus in on the first block:
+Blocks themselves have their own structure. Let's focus in on the first block:
 
 ```
-invite friends who are not busy
-  // Phase 1: Collect
-  [@"my party" date]
+match
+  party = [@"my party" date]
   friend = [#friend busy-dates != date]
-  // Phase 2: Mutate
-  maintain
-    friend += [#invited]
+bind
+  friend += #invited
 ```
 
-Blocks themselves have their own structure as well. Each block is written in two phases: collect then mutate, mirroring the Eve commands outlined earlier. In the collect phase, we ask Eve for known facts, and we might transform those facts using temporary variables. In the mutate phase we tell Eve to remember new facts. Let's look at each of those phases now:
+Each block is written in two phases: `match` then `action`. These phases mirr the two Eve commands outlined earlier. In the `match` phase, we ask Eve for known facts, and we might transform those facts using temporary variables. In the `action` phase we perform some mutation on the Eve DB to either add or remove facts. Let's look at each of those phases now:
 
-#### Phase 1: Collect
+#### Phase 1: Match
 
-The collect phase is used to gather all the information you need to complete your block. In the following block, we want to count all the guests coming to the party. To do this, we need the date of the party, a list of all my friends and their availability, and then a count of the guests on the list. Below, I've annotated what's going on in the collect phase.
+The `match` phase is used to gather all the information you need to complete your block. The `match` phase is prefaced with the `match` keyword, and can potentially be omitted.
+
+In the following block, we want to count all the guests coming to the party. To do this, we need the date of the party, a list of all my friends and their availability, and then a count of the guests on the list. Below, I've annotated what's going on in the collect phase.
 
 ```
-  // Phase 1: Collect
-  [@"my party" date]                    // Select the party and the date of the party
-  friend = [#friend busy-dates != date] // Select friends who are not busy during the party 
+match
+  party = [@"my party" date]              // Select the party and the date of the party
+  friend = [#friend busy-dates != date]   // Select friends who are not busy during the
 ```
 
 Let's take a look at other things you can do in the collect phase:
@@ -233,20 +286,19 @@ burger-switch = if guest.burgers = 1 then "burger"
 This block is used to switch between the singular and plural for displaying the number of burgers each guest is eating. `If` statements can be composed, permitting the creation of complex conditional statements. For instance, instead of inviting friends and their spouses in two blocks (the first two blocks in the example program), I could have done it in a single block using an `if` statement:
 
 ```
-invite friends who are not busy and their spouses
-  [@"my party" date]
-  friend = [#friend busy-dates != date]
-  guest = if friend then friend
-          if friend.spouse then friend.spouse
+[@"my party" date]
+friend = [#friend busy-dates != date]
+guest = if friend then friend
+        if friend.spouse then friend.spouse
 ```
 
 This is equivalent to a `union/and` operator, which combines elements from disparate sets into the same set. The second way to use `if` is in conjunction with the `else` keyword:
 
 ```
-  burgers = if guest = [@Arthur] then 3
-            else if guest = [#hungry] then 2
-            else if guest = [#vegetarian] then 0
-            else 1
+burgers = if guest = [@Arthur] then 3
+          else if guest = [#hungry] then 2
+          else if guest = [#vegetarian] then 0
+          else 1
 ```
 
 This is equivalent to a `choose/or` operator, selecting only the first branch with a non-empty body. A bug in this program is that if some guest is tagged both `#hungry` and `#vegetarian`, that guest will actually receive 2 burgers. Therefore, while order of statements usually does not matter in Eve, `if` statements are one area where it does.
@@ -254,10 +306,10 @@ This is equivalent to a `choose/or` operator, selecting only the first branch wi
 A final feature of the if statement is mutltiple returns. For instance, we could have done this:
 
 ```
-  (burgers, status) = if guest = [@Arthur] then (3, #fed)
-                      else if guest = [#hungry] then (2, #fed)
-                      else if guest = [#vegetarian] then (0, #needsfood)
-                      else (1, #fed)
+(burgers, status) = if guest = [@Arthur] then (3, #fed)
+                    else if guest = [#hungry] then (2, #fed)
+                    else if guest = [#vegetarian] then (0, #needsfood)
+                    else (1, #fed)
 ```
 
 ##### **Not**
@@ -272,105 +324,170 @@ friends not invited to the party
 
 ##### **Expressions**
 
-Expressions are used to perform calculations using constants and attributes of objects e.g. `party.burgers / party.guest-count` would calculate the ratio of burgers to the number of guests. Note that we are not subtracting `count` from `party.guest`. In expressions, you are required to add whitespace between operators. This helps with readability, but it also allows us to add more characters to names.
+Expressions are used to perform calculations using constants and attributes of objects e.g. `party.burgers / party.guest-count` would calculate the ratio of burgers to the number of guests. Note that `guest-count` is as variable, not an expression. In expressions, you are required to add whitespace between operators. This helps with readability, but it also allows us to add more characters to names.
 
-Operators are defined over sets, so you could do something like `cheese-slices = guest.burgers * 2`, which would multiply every guest’s burger count by two. There is a pitfall here: if you perform an operation on disjoint sets with differing cardinality, the result will be a [cartesian product](https://en.wikipedia.org/wiki/Cartesian_product) of the two sets. This is usually not a desired behavior, but sometimes it is what you want to do e.g. if you wanted to calculate the distance from every point in a set to every other point in the set, a cartesian product would be useful.
+Operators are defined over sets, so you could do something like `cheese-slices = guest.burgers * 2`, which would multiply every guest’s burger count by two. There is a pitfall here: if you perform an operation on disjoint sets (they have no attribute in common) with differing cardinality (there sets have a different number of elements), the result will be a [cartesian product](https://en.wikipedia.org/wiki/Cartesian_product) of the two sets. This is usually not a desired behavior, but sometimes it is what you want to do e.g. if you wanted to calculate the distance from every point in a set to every other point in another set, a cartesian product would be useful.
+
+##### **Functions**
+
+**Note: This section of the proposal is not implemented yet**
+
+It turns out that functions as they exist in other languages are mostly obviated by Eve's tag semantics. Consider the following two statements
+
+```
+x = sin(90)                // A typical function call
+[#sin deg: 90, return: x]  // An Eve object
+```
+
+These statements accomplish the same objective, of storing the sine of an angle in a result variable. The Eve syntax is at a disadvantage though, because it cannot be composed into an expression like a typical function. Therefore, we propose the following syntax for functions in Eve.
+
+```
+x = sin[deg: 90]
+```
+
+Which is sugar for
+
+```
+[#sin #function deg: 90, return: x]
+```
+
+The return attribute is implicitly the value of `sin[deg]`, so now the object can be used and composed like functions in other languages. We're proposing this syntax for several reasons. 
+
+- square brackets draw attention to the fact that the function call is nothing more than a regular object. 
+- Explict parameters are self-documenting, which meakes the code more readable if you're not familiar with the function signature.
+- Explicit parameters permit arguments in any order, which makes optional arguments easy to implement.
+- Finally, since functions are really just objects, you can extend a function so it can be used in new ways. For example, we could extend the `sin` function to support radians:
+
+``````
+Calculate the sine of an angle given in radians
+```
+match
+  return = sin[angle: value? * π / 180]
+bind
+  sin[rad: value?, return]
+```
+``````
+
+The `?` notation here indicates that the value is an input. We can use the extended function like so:
+
+```
+x = sin[rad: π/2]
+```
 
 ##### **String Interpolation**
 
-We support string interpolation (concatenation) is implemented using double curly braces e.g. `{{ }}`. For instance, when we print output, we use string interpolation to format the results:
+We support string interpolation (concatenation) using double curly braces embedded in a string e.g. `"{{ }}"`. In the party program, when we print output, we use string interpolation to format the results:
 
 ```
-  maintain
-    [#div children:
-      [#h1 text: "Guest List"]
-      [#div text: "{{name}} will eat {{guest.burgers}} {{burger-switch}}" sort: name]
-      [#h2 text: "Total burgers needed: {{burgers}}"]]
+bind
+  [#div children:
+    [#h1 text: "Guest List"]
+    [#div text: "{{name}} will eat {{guest.burgers}} {{burger-switch}}" sort: name]
+    [#h2 text: "Total burgers needed: {{burgers}}"]]
 ```
 
-Notice that the div printing the guest list is only written once, but because of set semantics, it will be printed as many times as there are elements in the set (in this case we'd expect it to be printed 5 times). For the same reason, the total burger count will only be printed once.
+The div that prints the guest name is only written once, but because of set semantics, it will be printed as many times as there are elements in the set (in this case we'd expect it to be printed 5 times). For the same reason, the total burger count will only be printed once.
 
-#### Phase 2: Mutate
+#### Phase 2: Action
 
-(We're also not happy with the mutate nomenclature. Any suggestions are appreciated).
+The `action` phase of a block indicates that we are changing the Eve DB in some way. This phase is preceeded by either the `bind` or `commit` fences (explained below). While the `match` phase can be omitted, omitting the `action` phase is probably an error i.e. the block doesn't do anything without an `action`. 
 
-In the mutate phase, we're ready to change the Eve DB in some way. The mutate phase is fenced off with either the `freeze` or `maintain` keywords (explained below). By convention, the mutate phase is indented twice, as a way to indicate the change in modality. The fence tells Eve that we're not longer interested in asking questions about objects. Thus we're no longer able to use any statements applicable to the collect phase e.g. `if`, `not`, aggregates, expressions, etc.
-
-Let's look at what happens in the mutate phase (this one comes from the first block in our party program):
-
-```
- // maintain tells us that we are delegating Eve the responsibiliy to update the subsequent values
-  maintain
-    friend += [#invited] // Add #invited to every friend who is invited
-```
+The transition to the `action` phase means we're no longer able to use any statements available in the `match` phase e.g. `if`, `not`, aggregates, expressions, etc.
 
 ##### Adding and Removing Objects
 
-Objects can be "frozen" in the Eve DB just by adding them after a mutation fence:
+Objects can be added to Eve after an `action` fence:
 
 ```
-create the party
-  [#session-connect]
-  freeze
-    [@"my party" date: 2]
+commit
+  [@"my party" date: 2]
 ```
 
 Objects can be removed from Eve using the `none` keyword. For example, we could remove `@"my party"` like so:
 
 ```
-freeze
+commit
  [@"my party"] := none
 ```
 
 ##### Mutation Operators
 
-We have three operators for mutating objects in the Eve DB: add, set, and remove:
+We have four operators for mutating objects in the Eve DB: add, set, remove and merge:
 
-- Add ( `+=` ) - adds attributes to an object.
-- Set ( `:=` ) - sets the value of attributes on an object
-- Remove ( `-=` ) - removes attributes from an object
+- Add ( `+=` ) - adds values to an attribute
+- Set ( `:=` ) - sets the value of an attribute
+- Remove ( `-=` ) - removes attribute with value from an object
+- Merge (`<-`) - merges one object with another
 
-Mutation operators can be used in two ways. First, you can add/set/remove a specific attribute on an object. E.g. `object.attribute = value`. Values can be anything, including objects. The alternative way allows you to add/set/remove multiple attributes. E.g. `object += [attribute1: value, attribute2: value, ...]`.
+###### Add, Set, and Remove
 
-Mutations follow set semantics. If an attribute exists on an object, using += will just add it to the set. For instance, if `person.age = 10`, and `person.age += 20`, then `person.age = {10, 20}` (note, the curly braces are not part of the syntax, but are a standard way of indicating a set).
-
-##### Freeze vs. Maintain
-
-We have two fences for the mutation phase, with differing behaviors. When you use `freeze`, you're telling Eve that you want the subsequent facts to persist in the database, irrespective of the supporting data. To see what I mean by this, For example, look at the last query:
+Add, set and remove all work similarly. On the left hand side of the operator you provide an object and attribute through dot notation. On the right hand side, you provide a value, that will either add to, set, or remove from the right hand side attribute. For example: 
 
 ```
-create the party
+party.burgers := total-burgers
+```
+
+Sets the `burgers` attribute on the `party` object to the value `total-burgers`. An exception to this is when the value is a tag or name. In either case, you don't have to specify an attribute on the right hand side. For example, the following adds the tag `#invited` to the `friend` object.
+
+```
+friend += #invited
+```
+
+Mutations follow set semantics. If an attribute exists on an object, using `+=` will just add it to the set. For instance, if `person.age = {10}`, and `person.age += 20`, then `person.age = {10, 20}` (note, the curly braces are not part of the syntax, but are a standard way of indicating a set).
+
+###### Merge
+
+Merge works differently from the other three operators. The purpose of the merge operator is to merge two objects together i.e. you're taking the set union of the objects. On the left hand side, you just provide an object handle. On the right hand side, you provide a new object. For instance
+
+```
+guest <- [burgers: 3]
+``` 
+
+This merges the new object into guest, setting burgers to 3. 
+
+##### Commit vs. Bind 
+
+We have two fences for the `action` phase, with differing semantics. The `commit` fence, tells Eve that any object behind the fence should persist in the database, even if the supporting data in the `match` phase is removed. For example:
+
+```
+match
   [#session-connect]
-  freeze
-    [@"my party" date: 2]
+commit
+  [@"my party" date: 2]
 ```
 
-We use `freeze` to indicate that this fact is frozen in time in the database, that time being when I connect to the Eve server. By contrast, consider:
+The use of `commit` here means that if `#session-connect` ever exists in the database, then the object `[@"my party" date: 2]` exists even if `#session-connect` is removed in the future. In fact `#session-connect` exists for only a single tic of compiler time, so if we didn't use `commit`, then the party would only exist for an instant and disappear.
+
+By contrast, the `bind` fence tells Eve that any object behind the fence is bound to the data in the `match` phase, and therefore only exists if that data exists. For example:    
 
 ```
-invite friends who are not busy
-  [@"my party" date]
+match
+  party = [@"my party" date]
   friend = [#friend busy-dates != date]
-  maintain
-    friend += [#invited]
+bind
+  friend += #invited
 ```
 
-In this case, the fence is `maintain`, so we're specifying that Eve will automatically keep `friend` up-to-date. The behavior of this code is that a `friend` is `#invited` as long as they are not busy during the date of the party. Let’s say my friend `@Arthur`’s calendar is initially clear, and so he is originally `#invited`. Then some time later, `@Arthur` suddenly adds the party date to his list of busy dates. Now, he no longer satisfies the conditions of the block, so Eve removes `#invited` from `@Arthur`, and he no longer shows up on the guest list, which also subsequently lowers the burger count. Had we used the freeze fence, then his initial admittance to the guest list would be permanent, and we would have too many burgers for the party.
+The behavior of this code is that a `friend` is `#invited` as long as they are not busy during the date of the party. Let’s say my friend `@Arthur`’s calendar is initially clear, and so he is originally `#invited`. Then some time later, `@Arthur` suddenly adds the party date to his list of busy dates. Now, he no longer satisfies the conditions of the block. Therefore, Eve removes `#invited` from `@Arthur`, and he no longer shows up on the guest list, which also subsequently lowers the burger count. Had we used the `commit` fence, then his initial invitation be permanent until we explicitly remove it.
 
-##### freeze all
+##### Commit global
 
-By default, any mutations made to the database are per session, meaning any facts you add to the database, are only visible to the session that added them. `Freeze` can be optionally followed by the `all` keyword, which indicates that the subsequent mutations are available globally, to all sessions connected to Eve.
+By default, any changes made to the database are per session. This means any facts added to the database are only visible to the session that added them. `Commit` can be optionally followed by the `global` keyword, which indicates that the fenced objects are available globally to all sessions connected to Eve.
 
 This is useful if you want to create a networked application. For our example, I might ask all my friends to write the following query:
 
-```
+``````
 Hi friends. Please edit the following Eve code for my party planning app.
 Just fill in your name, the dates your are busy, and add your spouse as well.
 You can also add either of the following tags: #hungry, and #vegetarian.
-  [#session-connect]
-  freeze all
-    [#friend name busy-dates spouse]
+
 ```
+match
+  [#session-connect]
+commit all
+  [#friend name busy-dates spouse]
+```
+``````
 
 Now, when my friends execute that block (filled in with their details), their data is available to my party planning application. 
 
