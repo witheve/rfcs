@@ -63,6 +63,7 @@ One other thing to know about Eve is that objects follow [set semantics](https:/
 
 Through the rest of this document, we'll refer to the following complete Eve program. Don't worry about understanding it right now; we'll go over what all the parts mean, and then hopefully the program will become clear. Let’s dive right in:
 
+
 ``````
 # Planning my birthday party
 
