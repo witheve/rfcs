@@ -360,12 +360,12 @@ The return attribute is implicitly the value of `sin[deg]`, so now the object ca
 
 ``````
 Calculate the sine of an angle given in radians
-```
+\```
 match
   return = sin[angle: value? * π / 180]
 bind
   sin[rad: value?, return]
-```
+\```
 ``````
 
 The `?` notation here indicates that the value is an input. We can use the extended function like so:
@@ -476,18 +476,18 @@ By default, any changes made to the database are per session. This means any fac
 
 This is useful if you want to create a networked application. For our example, I might ask all my friends to write the following query:
 
-``````
+```
 Hi friends. Please edit the following Eve code for my party planning app.
 Just fill in your name, the dates your are busy, and add your spouse as well.
 You can also add either of the following tags: #hungry, and #vegetarian.
 
-```
+\```
 match
   [#session-connect]
 commit all
   [#friend name busy-dates spouse]
+\```
 ```
-``````
 
 Now, when my friends execute that block (filled in with their details), their data is available to my party planning application. 
 
