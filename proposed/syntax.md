@@ -59,10 +59,11 @@ One last thing to note about control flow is that we have no concept of a loop i
 
 One other thing to know about Eve is that objects follow [set semantics](https://en.wikipedia.org/wiki/Set_(mathematics)). Sets are collections where every element of the collection is unique. This is in contrast to bag semantics, where elements can be duplicated. We’ll see the implications of this later, but it’s important to keep in mind.
 
-### A Working Program - Party Planning
+### A Complete Program - Party Planning
 
 Through the rest of this document, we'll refer to the following complete Eve program. Don't worry about understanding it right now; we'll go over what all the parts mean, and then hopefully the program will become clear. Let’s dive right in:
 
+**Note: Github's markdown rendere doesn't appear to support escaping nested code blocks, so just ignore the preceeding `\`**
 
 ``````
 # Planning my birthday party
