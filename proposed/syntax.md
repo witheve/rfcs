@@ -63,7 +63,7 @@ One other thing to know about Eve is that objects follow [set semantics](https:/
 
 Through the rest of this document, we'll refer to the following complete Eve program. Don't worry about understanding it right now; we'll go over what all the parts mean, and then hopefully the program will become clear. Let’s dive right in:
 
-``````
+<code>
 # Planning my birthday party
 
 This program figures out who can attend my party, and calculates how many burgers 
@@ -73,13 +73,13 @@ First I invite friends to the party. I can only invite friends who are not busy
 on the date of the party. Each one of my friends has marked their busy dates for 
 me.
 
-\```
+```
 match
   party = [@"my party" date]
   friend = [#friend busy-dates != date]
 bind
   friend += #invited
-\```
+```
 
 Guests are allowed to bring their spouses, so I have to invite them as well. I 
 won't invite spouses of friends who can't come to the party though.
@@ -166,7 +166,7 @@ James will eat 2 burgers
 Sam will eat 1 burger
 
 ## Total burgers needed: 7
-``````
+</code>
 
 Note: At the moment, this program does not execute correctly.
 
