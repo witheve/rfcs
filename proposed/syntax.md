@@ -170,7 +170,7 @@ Sam will eat 1 burger
 ## Total burgers needed: 7
 ```
 
-Note: At the moment, this program does not execute correctly.
+**Note: At the moment, this program does not execute correctly. We're working on adding the necessary features**
 
 #### Program Structure
 
