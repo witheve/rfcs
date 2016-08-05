@@ -63,6 +63,7 @@ One other thing to know about Eve is that objects follow [set semantics](https:/
 
 Through the rest of this document, we'll refer to the following complete Eve program. Don't worry about understanding it right now; we'll go over what all the parts mean, and then hopefully the program will become clear. Let’s dive right in:
 
+``````
 # Planning my birthday party
 
 This program figures out who can attend my party, and calculates how many burgers 
@@ -72,23 +73,23 @@ First I invite friends to the party. I can only invite friends who are not busy
 on the date of the party. Each one of my friends has marked their busy dates for 
 me.
 
-```
+\```
 match
   party = [@"my party" date]
   friend = [#friend busy-dates != date]
 bind
   friend += #invited
-```
+\```
 
 Guests are allowed to bring their spouses, so I have to invite them as well. I 
 won't invite spouses of friends who can't come to the party though.
 
-```
+\```
 match
   [#invited spouse]
 bind 
   spouse += #invited
-```
+\```
 
 I'm only serving burgers at my party. Guests can have between 0 and 3 burgers. 
 Vegetarians don't want any burgers, the standard amount is 1, and `#hungry` 
@@ -96,7 +97,7 @@ guests get 2. My friend `@Arthur` gets 3 burgers, because he's exceptionally
 hungry. I need to keep track of the total number of burgers needed, as well as 
 how many each guest prefers.
 
-```
+\```
 match
   guest = [#invited name]
   party = [@"my party"]
@@ -108,11 +109,11 @@ match
 bind
   party.burgers := total-burgers
   guest.burgers := burgers
-```
+\```
 
 Finally, I need to display the guest list and how many burgers I need total.
 
-```
+\```
 match
   [@"my party" burgers]
   guest = [#invited name]
@@ -123,23 +124,23 @@ bind
     [#h1 text: "Guest List"]
     [#div text: "{{name}} will eat {{guest.burgers}} {{burger-switch}}" sort: name]
     [#h2 text: "Total burgers needed: {{burgers}}"]]
-```
+\```
 
 ## Data
 
 The rest of the code establishes the data needed to run the above program. I 
 instantiate the party here.
 
-```
+\```
 match
   [#session-connect]
 commit
   [@"my party" date: 2]
-```
+\```
 
 I also need to add facts about my friends in order for this to all work.
 
-```
+\```
 bind
   [#friend name: "James", busy-dates: 1 #hungry, spouse: [@Sam]]
   [#friend name: "Betty", busy-dates: 2, spouse: [@Joe], #hungry]
@@ -148,7 +149,7 @@ bind
   [#friend name: "Arthur", busy-dates: 3, #hungry]
   [name: "Sam" busy-dates: 3]
   [name: "Joe" busy-dates: 4]
-```
+\```
 
 ## Results
 
@@ -165,6 +166,7 @@ James will eat 2 burgers
 Sam will eat 1 burger
 
 ## Total burgers needed: 7
+```
 
 Note: At the moment, this program does not execute correctly.
 
