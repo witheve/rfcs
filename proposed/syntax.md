@@ -418,13 +418,13 @@ We have four operators for mutating objects in the Eve DB: add, set, remove and 
 
 ###### Add, Set, and Remove
 
-Add, set and remove all work similarly. On the left hand side of the operator you provide an object and attribute through dot notation. On the right hand side, you provide a value, that will either add to, set, or remove from the right hand side attribute. For example:
+Add, set and remove all work similarly. On the left hand side of the operator you provide an object and attribute through dot notation. On the right hand side, you provide a value, that will either add to, set, or remove from the left hand side attribute. For example:
 
 ```
 party.burgers := total-burgers
 ```
 
-sets the `burgers` attribute on the `party` object to the value `total-burgers`. An exception to this is when the value is a tag or name. In either case, you don't have to specify an attribute on the right hand side. For example, the following adds the tag `#invited` to the `friend` object.
+sets the `burgers` attribute on the `party` object to the value `total-burgers`. An exception to this is when the value is a tag or name. In either case, you don't have to specify an attribute on the left hand side. For example, the following adds the tag `#invited` to the `friend` object.
 
 ```
 friend += #invited
