@@ -21,7 +21,7 @@ In our [Jan/Feb dev diary](http://incidentalcomplexity.com/2016/06/10/jan-feb/) 
 
 We are specifically calling this a "developer syntax" because it is meant for software developers who know how to program. We want to make sure you understand this isn’t how we will present Eve to people who don’t know how to program.
 
-In recent months, the semantics of the Eve language have stabilized to something we're very happy with, and quite excited about. However, the graphical model for interacting with the Eve language is still very much in flux. We've now reached a point where we want to share our work with the community, and we can’t do that without a proper interface to the language. 
+In recent months, the semantics of the Eve language have stabilized to something we're very happy with, and quite excited about. However, the graphical model for interacting with the Eve language is still very much in flux. We've now reached a point where we want to share our work with the community, and we can’t do that without a proper interface to the language.
 
 Thus, to get Eve out to early adopters sooner, we have developed a textual syntax, quite different from what we've [shown so far](http://incidentalcomplexity.com/2016/06/30/apr/).
 
@@ -65,11 +65,11 @@ Through the rest of this document, we'll refer to the following complete Eve pro
 
     # Planning my birthday party
 
-    This program figures out who can attend my party, and calculates how many burgers 
-    I need to buy. 
+    This program figures out who can attend my party, and calculates how many burgers
+    I need to buy.
 
-    First I invite friends to the party. I can only invite friends who are not busy 
-    on the date of the party. Each one of my friends has marked their busy dates for 
+    First I invite friends to the party. I can only invite friends who are not busy
+    on the date of the party. Each one of my friends has marked their busy dates for
     me.
 
     ```
@@ -80,20 +80,20 @@ Through the rest of this document, we'll refer to the following complete Eve pro
       friend += #invited
     ```
 
-    Guests are allowed to bring their spouses, so I have to invite them as well. I 
+    Guests are allowed to bring their spouses, so I have to invite them as well. I
     won't invite spouses of friends who can't come to the party though.
 
     ```
     match
       [#invited spouse]
-    bind 
+    bind
       spouse += #invited
     ```
 
-    I'm only serving burgers at my party. Guests can have between 0 and 3 burgers. 
-    Vegetarians don't want any burgers, the standard amount is 1, and `#hungry` 
-    guests get 2. My friend `@Arthur` gets 3 burgers, because he's exceptionally 
-    hungry. I need to keep track of the total number of burgers needed, as well as 
+    I'm only serving burgers at my party. Guests can have between 0 and 3 burgers.
+    Vegetarians don't want any burgers, the standard amount is 1, and `#hungry`
+    guests get 2. My friend `@Arthur` gets 3 burgers, because he's exceptionally
+    hungry. I need to keep track of the total number of burgers needed, as well as
     how many each guest prefers.
 
     ```
@@ -127,7 +127,7 @@ Through the rest of this document, we'll refer to the following complete Eve pro
 
     ## Data
 
-    The rest of the code establishes the data needed to run the above program. I 
+    The rest of the code establishes the data needed to run the above program. I
     instantiate the party here.
 
     ```
@@ -170,7 +170,7 @@ Through the rest of this document, we'll refer to the following complete Eve pro
 
 #### Program Structure
 
-The first thing to notice is the broad structure of the program. In the spirit of [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming), Eve programs are primarily prose, interleaved with Eve code. Donald Knuth explains Literate Programming in his [influential paper](http://www.literateprogramming.com/knuthweb.pdf): 
+The first thing to notice is the broad structure of the program. In the spirit of [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming), Eve programs are primarily prose, interleaved with Eve code. Donald Knuth explains Literate Programming in his [influential paper](http://www.literateprogramming.com/knuthweb.pdf):
 
 > The practitioner of literate programming can be regarded as an essayist, whose main concern is with exposition and excellence of style. Such an author ...  strives for a program that is comprehensible because its concepts have been introduced in an order that is best for human understanding, using a mixture of formal and informal methods that reinforce each other.
 
@@ -195,7 +195,7 @@ object = [ attribute1: value1 attribute2: value2 ...  attributeN: valueN]
 
 Objects are essentially pattern matches against the Eve DB, i.e. objects ask Eve to find all the entities that match the supplied attribute shape. For example, our first object in the program is `[@"my party" date]`. The resulting object will consist of all the facts matching a `name` attribute with value "my party" and a date attribute with any value.
 
-The object also binds `date` to the top level `date` variable, accessible outside of the object (but only within the block). If you want to use `date` to mean something else, then you can alias it using the bind operator (see the next section). 
+The object also binds `date` to the top level `date` variable, accessible outside of the object (but only within the block). If you want to use `date` to mean something else, then you can alias it using the bind operator (see the next section).
 
 Objects can be bound to a variable, e.g. `party = [@"my party" date]`. This provides a handle to the object, allowing you to access and mutate attributes using dot notation, e.g. `party.date`.
 
@@ -268,7 +268,7 @@ Aggregates are functions that take an input set and produce an output set, typic
  total-burgers = sum(burgers given burgers, guest)
 ```
 
-Aggregates are called like functions in other languages, but there is a slight difference; the keyword `given` specifies the set we are summing over. 
+Aggregates are called like functions in other languages, but there is a slight difference; the keyword `given` specifies the set we are summing over.
 
 Recall that a set is an unordered collection of unique elements. In our example, `burgers = (3, 0, 1, 2, 1)`, which as a set is `{3, 0, 1, 2}`. Thus `sum(burgers given burgers) = 6`, which is not what we expect. However, when we say `sum(burgers given burgers, guests)` then each burger is associated with a corresponding guest, making each element unique, e.g. `(burgers, guest) = {{Arthur, 3}, {Carol, 0}, {Duncan, 1}, {James, 2}, {Sam, 1}}`. Summing burgers given this set yields the expected result of `7`, because the duplicated one is now unique.
 
@@ -349,9 +349,9 @@ which is sugar for:
 [#sin #function deg: 90, return: x]
 ```
 
-The return attribute is implicitly the value of `sin[deg]`, so now the object can be used and composed like functions in other languages. We're proposing this syntax for several reasons. 
+The return attribute is implicitly the value of `sin[deg]`, so now the object can be used and composed like functions in other languages. We're proposing this syntax for several reasons.
 
-- Square brackets draw attention to the fact that the function call is nothing more than a regular object. 
+- Square brackets draw attention to the fact that the function call is nothing more than a regular object.
 - Explicit parameters are self-documenting, which makes the code more readable if you're not familiar with the function signature.
 - Explicit parameters permit arguments in any order, which makes optional arguments easy to implement.
 - Finally, since functions are really just objects, you can extend a function so it can be used in new ways. For example, we could extend the `sin` function to support radians:
@@ -387,7 +387,7 @@ The `div` that prints the guest name is only written once, but because of set se
 
 #### Phase 2: Action
 
-The `action` phase of a block indicates that we are changing the Eve DB in some way. This phase is preceded by either the `bind` or `commit` fences (explained below). While the `match` phase can be omitted, omitting the `action` phase is probably an error, i.e. the block doesn't do anything without an `action`. 
+The `action` phase of a block indicates that we are changing the Eve DB in some way. This phase is preceded by either the `bind` or `commit` fences (explained below). While the `match` phase can be omitted, omitting the `action` phase is probably an error, i.e. the block doesn't do anything without an `action`.
 
 The transition to the `action` phase means we're no longer able to use any statements available in the `match` phase, e.g. `if`, `not`, aggregates, expressions, etc.
 
@@ -418,7 +418,7 @@ We have four operators for mutating objects in the Eve DB: add, set, remove and 
 
 ###### Add, Set, and Remove
 
-Add, set and remove all work similarly. On the left hand side of the operator you provide an object and attribute through dot notation. On the right hand side, you provide a value, that will either add to, set, or remove from the right hand side attribute. For example: 
+Add, set and remove all work similarly. On the left hand side of the operator you provide an object and attribute through dot notation. On the right hand side, you provide a value, that will either add to, set, or remove from the right hand side attribute. For example:
 
 ```
 party.burgers := total-burgers
@@ -438,11 +438,11 @@ Merge works differently from the other three operators. The purpose of the merge
 
 ```
 guest <- [burgers: 3]
-``` 
+```
 
-This merges the new object into `guest`, setting `burgers` to `3`. 
+This merges the new object into `guest`, setting `burgers` to `3`.
 
-##### Commit vs. Bind 
+##### Commit vs. Bind
 
 We have two fences for the `action` phase, with differing semantics. The `commit` fence tells Eve that any object behind the fence should persist in the database, even if the supporting data in the `match` phase is removed. For example:
 
@@ -455,7 +455,7 @@ commit
 
 The use of `commit` here means that if `#session-connect` ever exists in the database, then the object `[@"my party" date: 2]` exists even if `#session-connect` is removed in the future. In fact `#session-connect` exists for only a single tick of compiler time, so if we didn't use `commit`, then the party would only exist for an instant and disappear.
 
-By contrast, the `bind` fence tells Eve that any object behind the fence is bound to the data in the `match` phase, and therefore only exists if that data exists. For example:    
+By contrast, the `bind` fence tells Eve that any object behind the fence is bound to the data in the `match` phase, and therefore only exists if that data exists. For example:
 
 ```
 match
@@ -484,7 +484,7 @@ This is useful if you want to create a networked application. For our example, I
       [#friend name busy-dates spouse]
     ```
 
-Now, when my friends execute that block (filled in with their details), their data is available to my party planning application. 
+Now, when my friends execute that block (filled in with their details), their data is available to my party planning application.
 
 ## Other Examples
 
@@ -498,7 +498,7 @@ Another drawback is having a syntax at all, in that it forces us to maintain two
 
 ## Alternatives
 
-We’ve tried various syntaxes before this one. Earlier this year we had a syntax based on s-expressions, which you can read about [here](http://incidentalcomplexity.com/2016/06/10/jan-feb/) and [here](http://incidentalcomplexity.com/2016/06/22/mar2/). You can also look at our earliest syntax [here](https://github.com/witheve/eve-experiments/tree/syntax/examples). 
+We’ve tried various syntaxes before this one. Earlier this year we had a syntax based on s-expressions, which you can read about [here](http://incidentalcomplexity.com/2016/06/10/jan-feb/) and [here](http://incidentalcomplexity.com/2016/06/22/mar2/). You can also look at our earliest syntax [here](https://github.com/witheve/eve-experiments/tree/syntax/examples).
 
 ## Risks
 
