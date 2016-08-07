@@ -270,7 +270,7 @@ Aggregates are functions that take an input set and produce an output set, typic
 
 Aggregates are called like functions in other languages, but there is a slight difference; the keyword `given` specifies the set we are summing over.
 
-Recall that a set is an unordered collection of unique elements. In our example, `burgers = (3, 0, 1, 2, 1)`, which as a set is `{3, 0, 1, 2}`. Thus `sum(burgers given burgers) = 6`, which is not what we expect. However, when we say `sum(burgers given burgers, guests)` then each burger is associated with a corresponding guest, making each element unique, e.g. `(burgers, guest) = {{Arthur, 3}, {Carol, 0}, {Duncan, 1}, {James, 2}, {Sam, 1}}`. Summing burgers given this set yields the expected result of `7`, because the duplicated one is now unique.
+Recall that a set is an unordered collection of unique elements. In our example, `burgers = (3, 0, 1, 2, 1)`, which as a set is `{3, 0, 1, 2}`. Thus `sum(burgers given burgers) = 6`, which is not what we expect. However, when we say `sum(burgers given burgers, guests)` then each burger is associated with a corresponding guest, making each element unique, e.g. `(burgers, guest) = {{3, Arthur}, {0, Carol}, {1, Duncan}, {2, James}, {1, Sam}}`. Summing burgers given this set yields the expected result of `7`, because the duplicated one is now unique.
 
 ##### **If**
 
