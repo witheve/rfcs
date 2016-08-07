@@ -190,7 +190,7 @@ Literate programming is a first-class design concept in Eve. We will be writing 
 Objects are the predominant datatype in Eve. In the proposed syntax, objects are a set of attribute:value pairs enclosed in square brackets:
 
 ```
-object = [ attribute1: value1 attribute2: value2 ...  attributeN: valueN]
+object = [ attribute1: value1 attribute2: value2 ... attributeN: valueN]
 ```
 
 Objects are essentially pattern matches against the Eve DB, i.e. objects ask Eve to find all the entities that match the supplied attribute shape. For example, our first object in the program is `[@"my party" date]`. The resulting object will consist of all the facts matching a `name` attribute with value "my party" and a date attribute with any value.
@@ -207,15 +207,15 @@ Names are another way to say one thing is equivalent to another; within a block,
 
 ```
 People who are 50 years old
-  [tag: "person" age]
-  age = 50
+  [tag: "person" age]
+  age = 50
 
 The same query as above
- [#person age: 50]
+  [#person age: 50]
 
 Never true
- [#person age: 10]
- person.age = 20
+  [#person age: 10]
+  person.age = 20
 ```
 
 Names are a little more permissive in our syntax than other languages. We allow most symbols in a name (with the exception of space, @, #, //, period, question, comma, colon, and grouping symbols). So operators like `-` and `+` are valid symbols in a name. Furthermore, we support Unicode, so you can include symbols (such as letters from the Greek alphabet). Such permissive naming comes at the cost of requiring whitespace in expressions. For example `friend-age` is a name, whereas `friend - age` is subtracting `age` from `friend`.
@@ -265,7 +265,7 @@ Let's take a look at other things you can do in the `match` phase:
 Aggregates are functions that take an input set and produce an output set, typically with a different cardinality than the input set. For example, `count` takes an input set of cardinality `N` and produces a set of cardinality `1` as a result. A familiar analogue in other languages is the `reduce()` function. Here is an example of an aggregate in use:
 
 ```
- total-burgers = sum(burgers given burgers, guest)
+total-burgers = sum(burgers given burgers, guest)
 ```
 
 Aggregates are called like functions in other languages, but there is a slight difference; the keyword `given` specifies the set we are summing over.
@@ -404,7 +404,7 @@ Objects can be removed from Eve using the `none` keyword. For example, we could 
 
 ```
 commit
- [@"my party"] := none
+  [@"my party"] := none
 ```
 
 ##### Mutation Operators
