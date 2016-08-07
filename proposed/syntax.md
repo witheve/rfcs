@@ -19,9 +19,9 @@ Today we are asking community feedback on our current developer syntax proposal.
 
 In our [Jan/Feb dev diary](http://incidentalcomplexity.com/2016/06/10/jan-feb/) we talked a little about the need for a syntax during our development, even if ultimately most users will never see it. To summarize: while the graphical interface is under development, a textual syntax helps us test the platform, share code, and find/report/reproduce bugs.
 
-We are specifically calling this a "developer syntax" because it is meant for software developers who know how to program. We want to make sure you understand this isn’t how we will present Eve to people who don’t know how to program.
+We are specifically calling this a "developer syntax" because it is meant for software developers who know how to program. We want to make sure you understand this isn't how we will present Eve to people who don't know how to program.
 
-In recent months, the semantics of the Eve language have stabilized to something we're very happy with, and quite excited about. However, the graphical model for interacting with the Eve language is still very much in flux. We've now reached a point where we want to share our work with the community, and we can’t do that without a proper interface to the language.
+In recent months, the semantics of the Eve language have stabilized to something we're very happy with, and quite excited about. However, the graphical model for interacting with the Eve language is still very much in flux. We've now reached a point where we want to share our work with the community, and we can't do that without a proper interface to the language.
 
 Thus, to get Eve out to early adopters sooner, we have developed a textual syntax, quite different from what we've [shown so far](http://incidentalcomplexity.com/2016/06/30/apr/).
 
@@ -33,7 +33,7 @@ Here are the broad design goals we identified when designing the syntax:
 
 1. **For Humans** - This syntax is designed for humans, so decisions regarding the ergonomics of the syntax are of primary concern.
 2. **Readable** - Since code is read more than written, we want the syntax to be eminently readable.
-3. **Consistent** - The syntax should be consistent with prior knowledge, so that users unfamiliar with Eve can read an Eve program and figure out what’s going on at a high level without explicitly knowing the syntax.
+3. **Consistent** - The syntax should be consistent with prior knowledge, so that users unfamiliar with Eve can read an Eve program and figure out what's going on at a high level without explicitly knowing the syntax.
 4. **Distinct** - This one is purposefully in contention with goal (3); we want the syntax to be familiar but not too familiar. If our syntax is too close to other languages (e.g. if we used C-style curly braces), we might project that our semantics are similar, when in fact they are very different.
 
 ### Programming Model
@@ -57,11 +57,11 @@ One last thing to note about control flow is that we have no concept of a loop i
 
 #### Set Semantics
 
-One other thing to know about Eve is that objects follow [set semantics](https://en.wikipedia.org/wiki/Set_(mathematics)). Sets are collections where every element of the collection is unique. This is in contrast to bag semantics, where elements can be duplicated. We’ll see the implications of this later, but it’s important to keep in mind.
+One other thing to know about Eve is that objects follow [set semantics](https://en.wikipedia.org/wiki/Set_(mathematics)). Sets are collections where every element of the collection is unique. This is in contrast to bag semantics, where elements can be duplicated. We'll see the implications of this later, but it's important to keep in mind.
 
 ### A Complete Program - Party Planning
 
-Through the rest of this document, we'll refer to the following complete Eve program. Don't worry about understanding it right now; we'll go over what all the parts mean, and then hopefully the program will become clear. Let’s dive right in:
+Through the rest of this document, we'll refer to the following complete Eve program. Don't worry about understanding it right now; we'll go over what all the parts mean, and then hopefully the program will become clear. Let's dive right in:
 
     # Planning my birthday party
 
@@ -222,7 +222,7 @@ Names are a little more permissive in our syntax than other languages. We allow 
 
 ### Object Names and Tags
 
-We’ve identified two attributes that are generally useful, so we’ve given them special syntax. These attributes are `name` and `tag`.
+We've identified two attributes that are generally useful, so we've given them special syntax. These attributes are `name` and `tag`.
 
 #### Name Selector ( `@` )
 
@@ -324,7 +324,7 @@ friends not invited to the party
 
 Expressions are used to perform calculations using constants and attributes of objects, e.g. `party.burgers / party.guest-count` would calculate the ratio of burgers to the number of guests. Note that `guest-count` is a variable, not an expression. In expressions, you are required to add whitespace between operators. This helps with readability, but it also allows us to add more characters to names.
 
-Operators are defined over sets, so you could do something like `cheese-slices = guest.burgers * 2`, which would multiply every guest’s burger count by two. There is a pitfall here: if you perform an operation on disjoint sets (they have no attribute in common) with differing cardinality (their sets have a different number of elements), the result will be a [Cartesian product](https://en.wikipedia.org/wiki/Cartesian_product) of the two sets. This is usually not a desired behavior, but sometimes it is what you want to do, e.g. if you wanted to calculate the distance from every point in a set to every point in another set, a Cartesian product would be useful.
+Operators are defined over sets, so you could do something like `cheese-slices = guest.burgers * 2`, which would multiply every guest's burger count by two. There is a pitfall here: if you perform an operation on disjoint sets (they have no attribute in common) with differing cardinality (their sets have a different number of elements), the result will be a [Cartesian product](https://en.wikipedia.org/wiki/Cartesian_product) of the two sets. This is usually not a desired behavior, but sometimes it is what you want to do, e.g. if you wanted to calculate the distance from every point in a set to every point in another set, a Cartesian product would be useful.
 
 ##### **Functions**
 
@@ -465,7 +465,7 @@ bind
   friend += #invited
 ```
 
-The behavior of this code is that a `friend` is `#invited` as long as they are not busy during the date of the party. Let’s say my friend `@Arthur`’s calendar is initially clear, and so he is originally `#invited`. Then some time later, `@Arthur` suddenly adds the party date to his list of busy dates. Now, he no longer satisfies the conditions of the block. Therefore, Eve removes `#invited` from `@Arthur`, and he no longer shows up on the guest list, which also subsequently lowers the burger count. Had we used the `commit` fence, then his initial invitation would be permanent until we explicitly remove it.
+The behavior of this code is that a `friend` is `#invited` as long as they are not busy during the date of the party. Let's say my friend `@Arthur`'s calendar is initially clear, and so he is originally `#invited`. Then some time later, `@Arthur` suddenly adds the party date to his list of busy dates. Now, he no longer satisfies the conditions of the block. Therefore, Eve removes `#invited` from `@Arthur`, and he no longer shows up on the guest list, which also subsequently lowers the burger count. Had we used the `commit` fence, then his initial invitation would be permanent until we explicitly remove it.
 
 ##### Commit global
 
@@ -498,7 +498,7 @@ Another drawback is having a syntax at all, in that it forces us to maintain two
 
 ## Alternatives
 
-We’ve tried various syntaxes before this one. Earlier this year we had a syntax based on s-expressions, which you can read about [here](http://incidentalcomplexity.com/2016/06/10/jan-feb/) and [here](http://incidentalcomplexity.com/2016/06/22/mar2/). You can also look at our earliest syntax [here](https://github.com/witheve/eve-experiments/tree/syntax/examples).
+We've tried various syntaxes before this one. Earlier this year we had a syntax based on s-expressions, which you can read about [here](http://incidentalcomplexity.com/2016/06/10/jan-feb/) and [here](http://incidentalcomplexity.com/2016/06/22/mar2/). You can also look at our earliest syntax [here](https://github.com/witheve/eve-experiments/tree/syntax/examples).
 
 ## Risks
 
