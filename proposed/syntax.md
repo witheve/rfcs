@@ -244,7 +244,7 @@ bind
   friend += #invited
 ```
 
-Each block is written in two phases: `match` then `action`. These phases mirror the two Eve commands outlined earlier. In the `match` phase, we ask Eve for known facts, and we might transform those facts using temporary variables. In the `action` phase we perform some mutation on the Eve DB to either add or remove facts. Let's look at each of those phases now:
+Each block is written in two phases: `match` then `action`. These phases mirror the two Eve commands outlined earlier. In the `match` phase, we ask Eve for known facts, and we might transform those facts using temporary variables. In the `action` phase we perform some action on the Eve DB to either add or remove facts. Let's look at each of those phases now:
 
 #### Phase 1: Match
 
@@ -407,9 +407,9 @@ commit
   [@"my party"] := none
 ```
 
-##### Mutation Operators
+##### Action Operators
 
-We have four operators for mutating objects in the Eve DB: add, set, remove and merge:
+We have four operators for performing actions on objects in the Eve DB: add, set, remove and merge:
 
 - Add ( `+=` ) - adds values to an attribute
 - Set ( `:=` ) - sets the value of an attribute
@@ -430,7 +430,7 @@ sets the `burgers` attribute on the `party` object to the value `total-burgers`.
 friend += #invited
 ```
 
-Mutations follow set semantics. If an attribute exists on an object, using `+=` will just add it to the set. For instance, if `person.age = {10}`, and `person.age += 20`, then `person.age = {10, 20}` (note: the curly braces are not part of the syntax, but are a standard way of indicating a set).
+Actions follow set semantics. If an attribute exists on an object, using `+=` will just add it to the set. For instance, if `person.age = {10}`, and `person.age += 20`, then `person.age = {10, 20}` (note: the curly braces are not part of the syntax, but are a standard way of indicating a set).
 
 ###### Merge
 
