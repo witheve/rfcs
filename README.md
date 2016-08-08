@@ -17,7 +17,7 @@ Our community is still in the early stages of development, so we're still figuri
 
 # When to write an RFC
 
-There is no one "test" that elevates a pull request to an RFC. However, one good rules is that an RFC is appropriate when the proposal affects disparate areas of the Eve community, especially across team boundaries. For example, a change to the syntax would affect everything from the parser to user programs, so it would certainly warrant an RFC.
+There is no one "test" that elevates a pull request to an RFC. However, one good rule is that an RFC is appropriate when the proposal affects disparate areas of the Eve community, especially across team boundaries. For example, a change to the syntax would affect everything from the parser to user programs, so it would certainly warrant an RFC.
 
 By contrast, an RFC would not be appropriate for a small bugfix, or largely cosmetic changes.
 
