@@ -434,7 +434,7 @@ Actions follow set semantics. If an attribute exists on an object, using `+=` wi
 
 ###### Merge
 
-Merge works differently from the other three operators. The purpose of the merge operator is to merge two objects together, i.e. you're taking the set union of the objects. On the left hand side, you just provide an object handle. On the right hand side, you provide a new object. For instance:
+Merge works differently from the other three operators. The purpose of the merge operator is to merge two objects together, i.e. updated object is the set union of the two objects. On the left hand side, you just provide an object handle. On the right hand side, you provide a new object. For instance:
 
 ```
 guest <- [burgers: 3]
