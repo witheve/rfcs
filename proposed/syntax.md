@@ -45,7 +45,7 @@ At its core, Eve only responds to two commands:
 1. What facts do you know about this "record"?
 2. Remember a new fact about this "record".
 
-Communication with Eve happens through "records", which are key-value pairs attached to a unique ID (record is a pretty generic and overloaded term, so let us know if you have ideas for what to call these guys). To access facts in the Eve DB, you use a record. To insert/remove facts into/from the Eve DB, you also use a record.
+Communication with Eve happens through "records", which are key-value pairs attached to a unique ID. To access facts in the Eve DB, you use a record. To insert/remove facts into/from the Eve DB, you also use a record.
 
 Computation occurs as a result of relationships between records. For example, I might model myself as a record with an `age` and a `birth year`. There might also be a record representing the `current year`. Then I could compute my `age` as my `birth year` subtracted from the `current year`.
 
