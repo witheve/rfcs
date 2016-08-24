@@ -42,22 +42,22 @@ To really understand a syntax, you have to also understand the semantics of the 
 
 At its core, Eve only responds to two commands:
 
-1. What facts do you know about this "object"?
-2. Remember a new fact about this "object".
+1. What facts do you know about this "record"?
+2. Remember a new fact about this "record".
 
-Communication with Eve happens through "objects", which are key-value pairs attached to a unique ID (object is a pretty generic and overloaded term, so let us know if you have ideas for what to call these guys). To access facts in the Eve DB, you use an object. To insert/remove facts into/from the Eve DB, you also use an object.
+Communication with Eve happens through "records", which are key-value pairs attached to a unique ID (record is a pretty generic and overloaded term, so let us know if you have ideas for what to call these guys). To access facts in the Eve DB, you use an record. To insert/remove facts into/from the Eve DB, you also use an record.
 
-Computation occurs as a result of relationships between objects. For example, I might model myself as an object with an `age` and a `birth year`. There might also be an object representing the `current year`. Then I could compute my `age` as my `birth year` subtracted from the `current year`.
+Computation occurs as a result of relationships between records. For example, I might model myself as an record with an `age` and a `birth year`. There might also be an record representing the `current year`. Then I could compute my `age` as my `birth year` subtracted from the `current year`.
 
 A key concept here is that age is a derived fact, supported by two other facts: `birth year` and `current year`. If either of those supporting facts are removed from the Eve DB, then `age` can no longer exist as well. For intuition, think about modeling this calculation in a spreadsheet using three cells, and what would happen to the `age` cell if you deleted one of the other two cells.
 
-Thus the presence or absence of facts can be used to control the flow of a program. To see how this works, consider how a navigation button on a webpage might work. When the button is clicked, a fact is inserted into the Eve DB noting the element that was clicked. This click fact would support an object that defines the page to be rendered. This in turn would support the page renderer, whose job it is to display the page.
+Thus the presence or absence of facts can be used to control the flow of a program. To see how this works, consider how a navigation button on a webpage might work. When the button is clicked, a fact is inserted into the Eve DB noting the element that was clicked. This click fact would support an record that defines the page to be rendered. This in turn would support the page renderer, whose job it is to display the page.
 
 One last thing to note about control flow is that we have no concept of a loop in Eve. Recursion is one way to recover looping, but set semantics and aggregates often obviate the need for recursion. In Eve, every value is actually a set. With operators defined over sets (think `map()`) and aggregation (think `reduce()`) we can actually do away with most cases where we would be tempted to use a loop.
 
 #### Set Semantics
 
-One other thing to know about Eve is that objects follow [set semantics](https://en.wikipedia.org/wiki/Set_(mathematics)). Sets are collections where every element of the collection is unique. This is in contrast to bag semantics, where elements can be duplicated. We'll see the implications of this later, but it's important to keep in mind.
+One other thing to know about Eve is that records follow [set semantics](https://en.wikipedia.org/wiki/Set_(mathematics)). Sets are collections where every element of the collection is unique. This is in contrast to bag semantics, where elements can be duplicated. We'll see the implications of this later, but it's important to keep in mind.
 
 ### A Complete Program - Party Planning
 
@@ -185,25 +185,25 @@ Writing code this way has several properties that result in higher quality progr
 
 Literate programming is a first-class design concept in Eve. We will be writing all of our programs in this manner, and will encourage others to do the same for the reasons above. That said, there is nothing in the syntax that specifically requires literate programming; you can write your program as a series of code blocks without any prose, and it will be perfectly valid.
 
-### Objects
+### Records
 
-Objects are the predominant datatype in Eve. In the proposed syntax, objects are a set of attribute:value pairs enclosed in square brackets:
+Records are the predominant datatype in Eve. In the proposed syntax, records are a set of attribute:value pairs enclosed in square brackets:
 
 ```
-object = [ attribute1: value1 attribute2: value2 ... attributeN: valueN]
+record = [ attribute1: value1 attribute2: value2 ... attributeN: valueN]
 ```
 
-Objects are essentially pattern matches against the Eve DB, i.e. objects ask Eve to find all the entities that match the supplied attribute shape. For example, our first object in the program is `[@"my party" date]`. The resulting object will consist of all the facts matching a `name` attribute with value "my party" and a date attribute with any value.
+Records are essentially pattern matches against the Eve DB, i.e. records ask Eve to find all the entities that match the supplied attribute shape. For example, our first record in the program is `[@"my party" date]`. The resulting record will consist of all the facts matching a `name` attribute with value "my party" and a date attribute with any value.
 
-The object also binds `date` to the top level `date` variable, accessible outside of the object (but only within the block). If you want to use `date` to mean something else, then you can alias it using the bind operator (see the next section).
+The record also binds `date` to the top level `date` variable, accessible outside of the record (but only within the block). If you want to use `date` to mean something else, then you can alias it using the bind operator (see the next section).
 
-Objects can be bound to a variable, e.g. `party = [@"my party" date]`. This provides a handle to the object, allowing you to access and mutate attributes using dot notation, e.g. `party.date`.
+Records can be bound to a variable, e.g. `party = [@"my party" date]`. This provides a handle to the record, allowing you to access and mutate attributes using dot notation, e.g. `party.date`.
 
 ### Binding, Equivalence, and Names
 
-Our syntax has two binding operators: colon ( `:` ), and equals ( `=` ). By convention, colon is used within objects, and equals is used outside of objects. Either way, binding works the same: binding asserts that the left hand side of the operator is equivalent to the right hand side. This is distinct from assignment, which is not a concept in Eve (therefore, we have no need for an `==` operator).
+Our syntax has two binding operators: colon ( `:` ), and equals ( `=` ). By convention, colon is used within records, and equals is used outside of records. Either way, binding works the same: binding asserts that the left hand side of the operator is equivalent to the right hand side. This is distinct from assignment, which is not a concept in Eve (therefore, we have no need for an `==` operator).
 
-Names are another way to say one thing is equivalent to another; within a block, variables with the same name represent the same object or attribute of an object. For instance:
+Names are another way to say one thing is equivalent to another; within a block, variables with the same name represent the same record or attribute of an record. For instance:
 
 ```
 People who are 50 years old
@@ -220,17 +220,17 @@ Never true
 
 Names are a little more permissive in our syntax than other languages. We allow most symbols in a name (with the exception of space, @, #, //, period, question, comma, colon, and grouping symbols). So operators like `-` and `+` are valid symbols in a name. Furthermore, we support Unicode, so you can include symbols (such as letters from the Greek alphabet). Such permissive naming comes at the cost of requiring whitespace in expressions. For example `friend-age` is a name, whereas `friend - age` is subtracting `age` from `friend`.
 
-### Object Names and Tags
+### Record Names and Tags
 
 We've identified two attributes that are generally useful, so we've given them special syntax. These attributes are `name` and `tag`.
 
 #### Name Selector ( `@` )
 
-The name selector is used to select a specific named object from the Eve DB. Named objects are just objects with a `name` attribute specified. In the example program,`[@"my party"]` is shorthand for `[name: "my party"]`.
+The name selector is used to select a specific named record from the Eve DB. Named records are just records with a `name` attribute specified. In the example program,`[@"my party"]` is shorthand for `[name: "my party"]`.
 
 #### Tag Selector ( `#` )
 
-The tag selector is used for selecting a group of similar objects, i.e. objects with the same tag attribute. In the above example, we used `[#friend]`, which is shorthand for `[tag: "friend"]`.
+The tag selector is used for selecting a group of similar records, i.e. records with the same tag attribute. In the above example, we used `[#friend]`, which is shorthand for `[tag: "friend"]`.
 
 ### Block structure
 
@@ -274,7 +274,7 @@ Recall that a set is an unordered collection of unique elements. In our example,
 
 ##### **If**
 
-`If` allows conditional equivalence, and works a lot like `if` in other languages. Our `if` has two components: The keyword `if` followed by a conditional; and the keyword `then` followed by one or more return objects. An optional `else` keyword indicates the default value:
+`If` allows conditional equivalence, and works a lot like `if` in other languages. Our `if` has two components: The keyword `if` followed by a conditional; and the keyword `then` followed by one or more return records. An optional `else` keyword indicates the default value:
 
 ```
 burger-switch = if guest.burgers = 1 then "burger"
@@ -312,7 +312,7 @@ A final feature of the if statement is multiple returns. For instance, we could 
 
 ##### **Not**
 
-Not is an anti-join operator, which takes a body of objects. For example, we can get a list of people who are not invited to the party:
+Not is an anti-join operator, which takes a body of records. For example, we can get a list of people who are not invited to the party:
 
 ```
 friends not invited to the party
@@ -322,7 +322,7 @@ friends not invited to the party
 
 ##### **Expressions**
 
-Expressions are used to perform calculations using constants and attributes of objects, e.g. `party.burgers / party.guest-count` would calculate the ratio of burgers to the number of guests. Note that `guest-count` is a variable, not an expression. In expressions, you are required to add whitespace between operators. This helps with readability, but it also allows us to add more characters to names.
+Expressions are used to perform calculations using constants and attributes of records, e.g. `party.burgers / party.guest-count` would calculate the ratio of burgers to the number of guests. Note that `guest-count` is a variable, not an expression. In expressions, you are required to add whitespace between operators. This helps with readability, but it also allows us to add more characters to names.
 
 Operators are defined over sets, so you could do something like `cheese-slices = guest.burgers * 2`, which would multiply every guest's burger count by two. There is a pitfall here: if you perform an operation on disjoint sets (they have no attribute in common) with differing cardinality (their sets have a different number of elements), the result will be a [Cartesian product](https://en.wikipedia.org/wiki/Cartesian_product) of the two sets. This is usually not a desired behavior, but sometimes it is what you want to do, e.g. if you wanted to calculate the distance from every point in a set to every point in another set, a Cartesian product would be useful.
 
@@ -334,10 +334,10 @@ It turns out that functions as they exist in other languages are mostly obviated
 
 ```
 x = sin(90)                // A typical function call
-[#sin deg: 90, return: x]  // An Eve object
+[#sin deg: 90, return: x]  // An Eve record
 ```
 
-These statements accomplish the same objective, of storing the sine of an angle in a result variable. The Eve syntax is at a disadvantage though, because it cannot be composed into an expression like a typical function. Therefore, we propose the following syntax for functions in Eve:
+These statements accomplish the same recordive, of storing the sine of an angle in a result variable. The Eve syntax is at a disadvantage though, because it cannot be composed into an expression like a typical function. Therefore, we propose the following syntax for functions in Eve:
 
 ```
 x = sin[deg: 90]
@@ -349,12 +349,12 @@ which is sugar for:
 [#sin #function deg: 90, return: x]
 ```
 
-The return attribute is implicitly the value of `sin[deg]`, so now the object can be used and composed like functions in other languages. We're proposing this syntax for several reasons.
+The return attribute is implicitly the value of `sin[deg]`, so now the record can be used and composed like functions in other languages. We're proposing this syntax for several reasons.
 
-- Square brackets draw attention to the fact that the function call is nothing more than a regular object.
+- Square brackets draw attention to the fact that the function call is nothing more than a regular record.
 - Explicit parameters are self-documenting, which makes the code more readable if you're not familiar with the function signature.
 - Explicit parameters permit arguments in any order, which makes optional arguments easy to implement.
-- Finally, since functions are really just objects, you can extend a function so it can be used in new ways. For example, we could extend the `sin` function to support radians:
+- Finally, since functions are really just records, you can extend a function so it can be used in new ways. For example, we could extend the `sin` function to support radians:
 
 
         Calculate the sine of an angle given in radians
@@ -391,16 +391,16 @@ The `action` phase of a block indicates that we are changing the Eve DB in some 
 
 The transition to the `action` phase means we're no longer able to use any statements available in the `match` phase, e.g. `if`, `not`, aggregates, expressions, etc.
 
-##### Adding and Removing Objects
+##### Adding and Removing Records
 
-Objects can be added to Eve after an `action` fence:
+Records can be added to Eve after an `action` fence:
 
 ```
 commit
   [@"my party" date: 2]
 ```
 
-Objects can be removed from Eve using the `none` keyword. For example, we could remove `@"my party"` like so:
+Records can be removed from Eve using the `none` keyword. For example, we could remove `@"my party"` like so:
 
 ```
 commit
@@ -409,42 +409,42 @@ commit
 
 ##### Action Operators
 
-We have four operators for performing actions on objects in the Eve DB: add, set, remove and merge:
+We have four operators for performing actions on records in the Eve DB: add, set, remove and merge:
 
 - Add ( `+=` ) - adds values to an attribute
 - Set ( `:=` ) - sets the value of an attribute
-- Remove ( `-=` ) - removes attribute with value from an object
-- Merge (`<-`) - merges one object with another
+- Remove ( `-=` ) - removes attribute with value from an record
+- Merge (`<-`) - merges one record with another
 
 ###### Add, Set, and Remove
 
-Add, set and remove all work similarly. On the left hand side of the operator you provide an object and attribute through dot notation. On the right hand side, you provide a value, that will either add to, set, or remove from the left hand side attribute. For example:
+Add, set and remove all work similarly. On the left hand side of the operator you provide an record and attribute through dot notation. On the right hand side, you provide a value, that will either add to, set, or remove from the left hand side attribute. For example:
 
 ```
 party.burgers := total-burgers
 ```
 
-sets the `burgers` attribute on the `party` object to the value `total-burgers`. An exception to this is when the value is a tag or name. In either case, you don't have to specify an attribute on the left hand side. For example, the following adds the tag `#invited` to the `friend` object.
+sets the `burgers` attribute on the `party` record to the value `total-burgers`. An exception to this is when the value is a tag or name. In either case, you don't have to specify an attribute on the left hand side. For example, the following adds the tag `#invited` to the `friend` record.
 
 ```
 friend += #invited
 ```
 
-Actions follow set semantics. If an attribute exists on an object, using `+=` will just add it to the set. For instance, if `person.age = {10}`, and `person.age += 20`, then `person.age = {10, 20}` (note: the curly braces are not part of the syntax, but are a standard way of indicating a set).
+Actions follow set semantics. If an attribute exists on an record, using `+=` will just add it to the set. For instance, if `person.age = {10}`, and `person.age += 20`, then `person.age = {10, 20}` (note: the curly braces are not part of the syntax, but are a standard way of indicating a set).
 
 ###### Merge
 
-Merge works differently from the other three operators. The purpose of the merge operator is to merge two objects together, i.e. updated object is the set union of the two objects. On the left hand side, you just provide an object handle. On the right hand side, you provide a new object. For instance:
+Merge works differently from the other three operators. The purpose of the merge operator is to merge two records together, i.e. updated record is the set union of the two records. On the left hand side, you just provide an record handle. On the right hand side, you provide a new record. For instance:
 
 ```
 guest <- [burgers: 3]
 ```
 
-This merges the new object into `guest`, setting `burgers` to `3`.
+This merges the new record into `guest`, setting `burgers` to `3`.
 
 ##### Commit vs. Bind
 
-We have two fences for the `action` phase, with differing semantics. The `commit` fence tells Eve that any object behind the fence should persist in the database, even if the supporting data in the `match` phase is removed. For example:
+We have two fences for the `action` phase, with differing semantics. The `commit` fence tells Eve that any record behind the fence should persist in the database, even if the supporting data in the `match` phase is removed. For example:
 
 ```
 match
@@ -453,9 +453,9 @@ commit
   [@"my party" date: 2]
 ```
 
-The use of `commit` here means that if `#session-connect` ever exists in the database, then the object `[@"my party" date: 2]` exists even if `#session-connect` is removed in the future. In fact `#session-connect` exists for only a single tick of compiler time, so if we didn't use `commit`, then the party would only exist for an instant and disappear.
+The use of `commit` here means that if `#session-connect` ever exists in the database, then the record `[@"my party" date: 2]` exists even if `#session-connect` is removed in the future. In fact `#session-connect` exists for only a single tick of compiler time, so if we didn't use `commit`, then the party would only exist for an instant and disappear.
 
-By contrast, the `bind` fence tells Eve that any object behind the fence is bound to the data in the `match` phase, and therefore only exists if that data exists. For example:
+By contrast, the `bind` fence tells Eve that any record behind the fence is bound to the data in the `match` phase, and therefore only exists if that data exists. For example:
 
 ```
 match
@@ -469,7 +469,7 @@ The behavior of this code is that a `friend` is `#invited` as long as they are n
 
 ##### Commit global
 
-By default, any changes made to the database are per session. This means any facts added to the database are only visible to the session that added them. `Commit` can be optionally followed by the `global` keyword, which indicates that the fenced objects are available globally to all sessions connected to Eve.
+By default, any changes made to the database are per session. This means any facts added to the database are only visible to the session that added them. `Commit` can be optionally followed by the `global` keyword, which indicates that the fenced records are available globally to all sessions connected to Eve.
 
 This is useful if you want to create a networked application. For our example, I might ask all my friends to write the following query:
 
