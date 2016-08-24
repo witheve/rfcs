@@ -45,13 +45,13 @@ At its core, Eve only responds to two commands:
 1. What facts do you know about this "record"?
 2. Remember a new fact about this "record".
 
-Communication with Eve happens through "records", which are key-value pairs attached to a unique ID (record is a pretty generic and overloaded term, so let us know if you have ideas for what to call these guys). To access facts in the Eve DB, you use an record. To insert/remove facts into/from the Eve DB, you also use an record.
+Communication with Eve happens through "records", which are key-value pairs attached to a unique ID. To access facts in the Eve DB, you use a record. To insert/remove facts into/from the Eve DB, you also use a record.
 
-Computation occurs as a result of relationships between records. For example, I might model myself as an record with an `age` and a `birth year`. There might also be an record representing the `current year`. Then I could compute my `age` as my `birth year` subtracted from the `current year`.
+Computation occurs as a result of relationships between records. For example, I might model myself as a record with an `age` and a `birth year`. There might also be a record representing the `current year`. Then I could compute my `age` as my `birth year` subtracted from the `current year`.
 
 A key concept here is that age is a derived fact, supported by two other facts: `birth year` and `current year`. If either of those supporting facts are removed from the Eve DB, then `age` can no longer exist as well. For intuition, think about modeling this calculation in a spreadsheet using three cells, and what would happen to the `age` cell if you deleted one of the other two cells.
 
-Thus the presence or absence of facts can be used to control the flow of a program. To see how this works, consider how a navigation button on a webpage might work. When the button is clicked, a fact is inserted into the Eve DB noting the element that was clicked. This click fact would support an record that defines the page to be rendered. This in turn would support the page renderer, whose job it is to display the page.
+Thus the presence or absence of facts can be used to control the flow of a program. To see how this works, consider how a navigation button on a webpage might work. When the button is clicked, a fact is inserted into the Eve DB noting the element that was clicked. This click fact would support a record that defines the page to be rendered. This in turn would support the page renderer, whose job it is to display the page.
 
 One last thing to note about control flow is that we have no concept of a loop in Eve. Recursion is one way to recover looping, but set semantics and aggregates often obviate the need for recursion. In Eve, every value is actually a set. With operators defined over sets (think `map()`) and aggregation (think `reduce()`) we can actually do away with most cases where we would be tempted to use a loop.
 
@@ -179,9 +179,9 @@ This description fits with the ethos of Eve - that programming is primarily mean
 Writing code this way has several properties that result in higher quality programs:
 
 - Literate programming forces you to consider a human audience. While this is usually the first step in writing any document, in programming the audience is typically a machine. For an Eve program, the audience might be your collaborators, your boss, or even your future self when revisiting the program in a year. By considering the audience of your program source, you create an anchor from which the narrative of your program flows, leading to a more coherent document.
-- The human brain is [wired to engage](https://blog.bufferapp.com/science-of-storytelling-why-telling-a-story-is-the-most-powerful-way-to-activate-our-brains) with and remember stories. Think back to a book you read (or maybe a show you watched) last year. You probably remember in great detail all of the characters and their personalities, the pivotal moments of the plot, the descriptions of the various settings, etc. But how much can you remember of a piece of code you haven't looked at for a year? literate programming adds another dimension to your code that will help you keep more of your program in working memory.
+- The human brain is [wired to engage](https://blog.bufferapp.com/science-of-storytelling-why-telling-a-story-is-the-most-powerful-way-to-activate-our-brains) with and remember stories. Think back to a book you read (or maybe a show you watched) last year. You probably remember in great detail all of the characters and their personalities, the pivotal moments of the plot, the descriptions of the various settings, etc. But how much can you remember of a piece of code you haven't looked at for a year? Literate programming adds another dimension to your code that will help you keep more of your program in working memory.
 - Since Eve code blocks can be arranged in any order, literate programming encourages the programmer to arrange them in an way that makes narrative sense. Code can have a beginning, middle, and end just like a short story. Or like an epic novel, code can have many interwoven storylines. Either way, the structure of the code should follow an order imposed by a narrative, not one imposed by the compiler.
-- It's often said that you don't really understand something until you explain it to someone else. literate programming can reveal edge cases, incorrect assumptions, gaps in understanding the problem domain, and shaky implementation details before any code is even written.
+- It's often said that you don't really understand something until you explain it to someone else. Literate programming can reveal edge cases, incorrect assumptions, gaps in understanding the problem domain, and shaky implementation details before any code is even written.
 
 Literate programming is a first-class design concept in Eve. We will be writing all of our programs in this manner, and will encourage others to do the same for the reasons above. That said, there is nothing in the syntax that specifically requires literate programming; you can write your program as a series of code blocks without any prose, and it will be perfectly valid.
 
@@ -203,7 +203,7 @@ Records can be bound to a variable, e.g. `party = [@"my party" date]`. This prov
 
 Our syntax has two binding operators: colon ( `:` ), and equals ( `=` ). By convention, colon is used within records, and equals is used outside of records. Either way, binding works the same: binding asserts that the left hand side of the operator is equivalent to the right hand side. This is distinct from assignment, which is not a concept in Eve (therefore, we have no need for an `==` operator).
 
-Names are another way to say one thing is equivalent to another; within a block, variables with the same name represent the same record or attribute of an record. For instance:
+Names are another way to say one thing is equivalent to another; within a block, variables with the same name represent the same record or attribute of a record. For instance:
 
 ```
 People who are 50 years old
@@ -270,7 +270,7 @@ total-burgers = sum[value: burgers, given: (burgers, guest)]
 
 One important consideration when using an aggregate is the input set. Due to set semantics, the result may not be what you expect if the input set contains duplicate elements.
 
-Recall that a set is an unordered collection of unique elements. In our example, `burgers = (3, 0, 1, 2, 1)`, which as a set is `{3, 0, 1, 2}`. Thus `sum[value: burgers, given: burgers] = 6`, which is not what we expect. However, when we say `sum[value: burgers, given: (burgers, guests)]` then each burger is associated with a corresponding guest, making each element unique, e.g. `(burgers, guest) = {{3, Arthur}, {0, Carol}, {1, Duncan}, {2, James}, {1, Sam}}`. Summing burgers given this set yields the expected result of `7`, because the duplicated 1 is now unique.
+Recall that a set is an unordered collection of unique elements. In our example, `burgers = (3, 0, 1, 2, 1)`, which as a set is `{3, 0, 1, 2}`. Thus `sum[value: burgers, given: burgers] = 6`, which is not what we expect. However, when we say `sum[value: burgers, given: (burgers, guest)]` then each burger is associated with a corresponding guest, making each element unique, e.g. `(burgers, guest) = {{3, Arthur}, {0, Carol}, {1, Duncan}, {2, James}, {1, Sam}}`. Summing burgers given this set yields the expected result of `7`, because the duplicated `1` is now unique.
 
 ##### **If**
 
@@ -337,7 +337,7 @@ x = sin(90)                // A typical function call
 [#sin deg: 90, return: x]  // An Eve record
 ```
 
-These statements accomplish the same recordive, of storing the sine of an angle in a result variable. The Eve syntax is at a disadvantage though, because it cannot be composed into an expression like a typical function. Therefore, we propose the following syntax for functions in Eve:
+These statements accomplish the same objective, of storing the sine of an angle in a result variable. The Eve syntax is at a disadvantage though, because it cannot be composed into an expression like a typical function. Therefore, we propose the following syntax for functions in Eve:
 
 ```
 x = sin[deg: 90]
@@ -413,12 +413,12 @@ We have four operators for performing actions on records in the Eve DB: add, set
 
 - Add ( `+=` ) - adds values to an attribute
 - Set ( `:=` ) - sets the value of an attribute
-- Remove ( `-=` ) - removes attribute with value from an record
+- Remove ( `-=` ) - removes attribute with value from a record
 - Merge (`<-`) - merges one record with another
 
 ###### Add, Set, and Remove
 
-Add, set and remove all work similarly. On the left hand side of the operator you provide an record and attribute through dot notation. On the right hand side, you provide a value, that will either add to, set, or remove from the left hand side attribute. For example:
+Add, set and remove all work similarly. On the left hand side of the operator you provide a record and attribute through dot notation. On the right hand side, you provide a value, that will either add to, set, or remove from the left hand side attribute. For example:
 
 ```
 party.burgers := total-burgers
@@ -430,11 +430,11 @@ sets the `burgers` attribute on the `party` record to the value `total-burgers`.
 friend += #invited
 ```
 
-Actions follow set semantics. If an attribute exists on an record, using `+=` will just add it to the set. For instance, if `person.age = {10}`, and `person.age += 20`, then `person.age = {10, 20}` (note: the curly braces are not part of the syntax, but are a standard way of indicating a set).
+Actions follow set semantics. If an attribute exists on a record, using `+=` will just add it to the set. For instance, if `person.age = {10}`, and `person.age += 20`, then `person.age = {10, 20}` (note: the curly braces are not part of the syntax, but are a standard way of indicating a set).
 
 ###### Merge
 
-Merge works differently from the other three operators. The purpose of the merge operator is to merge two records together, i.e. updated record is the set union of the two records. On the left hand side, you just provide an record handle. On the right hand side, you provide a new record. For instance:
+Merge works differently from the other three operators. The purpose of the merge operator is to merge two records together, i.e. the updated record is the set union of the two records. On the left hand side, you just provide a record handle. On the right hand side, you provide a new record. For instance:
 
 ```
 guest <- [burgers: 3]
