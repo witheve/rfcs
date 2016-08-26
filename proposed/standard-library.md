@@ -19,6 +19,54 @@ Proposed standard library
 - Date & Time - Includes functions that provide and manipulate date and time records
 - Statistics - Includes functions that calculate statistical measures on records
 
+## Implementation
+
+### Math
+
+#### Arithemtic
+
+- plus (`+`)
+- minus (`-`)
+- times (`*`)
+- divide (`/`)
+
+#### General Math
+
+- abs - Absolute value
+- ceil - Round a number up 
+- floor - Round a number down
+- round - Round a number
+- mod - Modulo division
+
+#### Trigonometry
+
+- sin - Sine of an angle 
+- cos - Cosine of an angle 
+- tan - Tangent of an angle 
+
+### Strings
+
+- length
+- concatenate
+- replace
+- split
+- join
+
+### Date & Time
+
+- time - The current system time
+- date - The current system date
+
+### Statistics
+
+- mean
+- median
+- mode
+- standard-deviation
+- variance
+- max
+- min
+
 ## Drawbacks
 
 A large standard library can be onerous for a small project.
