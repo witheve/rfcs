@@ -211,10 +211,10 @@ People who are 50 years old
   age = 50
 
 The same query as above
-  [#person age: 50]
+  [tag: "person", age: 50]
 
 Never true
-  [#person age: 10]
+  [tag: "person", age: 10]
   person.age = 20
 ```
 
